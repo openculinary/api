@@ -31,7 +31,7 @@ def recipes():
     include = request.args.getlist('include[]')
     exclude = request.args.getlist('exclude[]')
     equipment = request.args.getlist('equipment[]')
-    offset = min(request.args.get('offset', type=int, default=0), (50*10)-10)
+    offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort')
     results = Recipe().search(include, exclude, equipment, offset, limit, sort)
