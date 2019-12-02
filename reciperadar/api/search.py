@@ -1,4 +1,5 @@
 from flask import jsonify, request
+from user_agents import parse as ua_parser
 
 from reciperadar import app
 from reciperadar.models.events.search import SearchEvent
@@ -25,10 +26,6 @@ def ingredients():
     return jsonify(results)
 
 
-def is_robot(user_agent):
-    return user_agent and 'www.uptimerobot.com' in user_agent
-
-
 @app.route('/api/recipes/search')
 def recipes():
     include = request.args.getlist('include[]')
@@ -40,7 +37,7 @@ def recipes():
     results = Recipe().search(include, exclude, equipment, offset, limit, sort)
 
     user_agent = request.headers.get('user-agent')
-    suspected_bot = is_robot(user_agent)
+    suspected_bot = ua_parser(user_agent or '').is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
     recrawl_search.delay(include, exclude, equipment, offset)
