@@ -52,8 +52,8 @@ def test_chicken_exclusion_contents():
 @pytest.mark.parametrize('product,category', product_categories().items())
 def test_product_categories(product, category):
     product = IngredientProduct(
-        product=f'{product}',
-        singular=f'{product}'
+        product=product,
+        singular=product
     )
 
     assert product.category == category
