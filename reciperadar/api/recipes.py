@@ -1,5 +1,7 @@
 from flask import abort, jsonify, request
 
+from sqlalchemy.sql.expression import func
+
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
 from reciperadar.services.database import Database
@@ -17,6 +19,17 @@ def recipe_get(recipe_id):
         return abort(404)
 
     response = recipe.to_doc()
+    session.close()
+
+    return jsonify(response)
+
+
+@app.route('/api/recipes/sample')
+@internal
+def recipes_sample():
+    session = Database().get_session()
+    recipes = session.query(Recipe).order_by(func.random()).limit(10)
+    response = [recipe.to_doc() for recipe in recipes]
     session.close()
 
     return jsonify(response)
