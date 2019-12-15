@@ -27,8 +27,10 @@ def recipe_get(recipe_id):
 @app.route('/api/recipes/sample')
 @internal
 def recipes_sample():
+    limit = request.args.get('limit', type=int, default=10)
+
     session = Database().get_session()
-    recipes = session.query(Recipe).order_by(func.random()).limit(10)
+    recipes = session.query(Recipe).order_by(func.random()).limit(limit)
     response = [recipe.to_doc() for recipe in recipes]
     session.close()
 
