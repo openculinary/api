@@ -27,9 +27,6 @@ class IngredientProduct(Storable):
     STATE_AVAILABLE = 'available'
     STATE_REQUIRED = 'required'
 
-    _category = None
-    _contents = None
-
     @staticmethod
     def from_doc(doc):
         product = doc.get('product')
@@ -45,15 +42,9 @@ class IngredientProduct(Storable):
             is_plural=is_plural,
             singular=singular,
             plural=plural,
-            _category=doc.get('category'),
-            _contents=doc.get('contents')
+            category=doc.get('category'),
+            contents=doc.get('contents')
         )
-
-    def to_doc(self):
-        result = super().to_doc()
-        result['category'] = self.category
-        result['contents'] = self.contents
-        return result
 
     def to_dict(self, include):
         states = {
