@@ -29,19 +29,14 @@ class IngredientProduct(Storable):
 
     @staticmethod
     def from_doc(doc):
-        product = doc.get('product')
-        is_plural = doc.get('is_plural')
-        singular = doc.get('singular')
-        plural = doc.get('plural')
-
         product_id = doc.get('id') or IngredientProduct.generate_id()
         return IngredientProduct(
             id=product_id,
-            product=product,
+            product=doc.get('product'),
             product_parser=doc.get('product_parser'),
-            is_plural=is_plural,
-            singular=singular,
-            plural=plural,
+            is_plural=doc.get('is_plural'),
+            singular=doc.get('singular'),
+            plural=doc.get('plural'),
             category=doc.get('category'),
             contents=doc.get('contents')
         )
