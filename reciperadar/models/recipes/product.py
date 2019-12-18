@@ -1,4 +1,3 @@
-import inflect
 from sqlalchemy import (
     Boolean,
     Column,
@@ -25,8 +24,6 @@ class IngredientProduct(Storable):
     STATE_AVAILABLE = 'available'
     STATE_REQUIRED = 'required'
 
-    inflector = inflect.engine()
-
     _category = None
     _contents = None
 
@@ -36,12 +33,6 @@ class IngredientProduct(Storable):
         is_plural = doc.get('is_plural')
         singular = doc.get('singular')
         plural = doc.get('plural')
-
-        if not singular or not plural:
-            singular = IngredientProduct.inflector.singular_noun(product)
-            singular = singular or product
-            plural = IngredientProduct.inflector.plural_noun(singular)
-            is_plural = product == plural
 
         product_id = doc.get('id') or IngredientProduct.generate_id()
         return IngredientProduct(
