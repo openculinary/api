@@ -4,6 +4,7 @@ from sqlalchemy import (
     ForeignKey,
     String,
 )
+from sqlalchemy.dialects import postgresql
 
 from reciperadar.models.base import Storable
 
@@ -20,6 +21,8 @@ class IngredientProduct(Storable):
     is_plural = Column(Boolean)
     singular = Column(String)
     plural = Column(String)
+    category = Column(String)
+    contents = Column(postgresql.ARRAY(String))
 
     STATE_AVAILABLE = 'available'
     STATE_REQUIRED = 'required'
