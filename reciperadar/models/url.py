@@ -76,8 +76,7 @@ class CrawlURL(BaseURL):
     def _make_request(self):
         response = requests.post(
             url='http://crawler-service/resolve',
-            data={'url': self.url},
-            proxies={}
+            data={'url': self.url}
         )
         if response.ok:
             self.resolves_to = response.json()['resolves_to']
@@ -90,6 +89,5 @@ class RecipeURL(BaseURL):
     def _make_request(self):
         return requests.post(
             url='http://crawler-service/crawl',
-            data={'url': self.url},
-            proxies={}
+            data={'url': self.url}
         )
