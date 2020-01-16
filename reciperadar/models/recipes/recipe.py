@@ -125,12 +125,25 @@ class Recipe(Storable, Searchable):
         return data
 
     @staticmethod
-    def _generate_include_clause(include):
+    def _generate_include_clause(include, match_exact=False):
         # sum the score of query ingredients found in the recipe
+        if not match_exact:
+            return [{
+                'constant_score': {
+                    'boost': 1,
+                    'filter': {'match': {'contents': inc}}
+                }
+            } for inc in include]
+
         return [{
-            'constant_score': {
-                'boost': 1,
-                'filter': {'match': {'contents': inc}}
+            'nested': {
+                'path': 'ingredients',
+                'query': {
+                    'constant_score': {
+                        'boost': 1,
+                        'filter': {'match': {'ingredients.product.product': inc}}
+                    }
+                }
             }
         } for inc in include]
 
@@ -184,7 +197,8 @@ class Recipe(Storable, Searchable):
         }
         return sort_configs[sort]
 
-    def _render_query(self, include, exclude, equipment, sort, match_all=True):
+    def _render_query(self, include, exclude, equipment, sort, match_all=True, match_exact=False):
+        include_exact_clause = self._generate_include_clause(include, True)
         include_clause = self._generate_include_clause(include)
         exclude_clause = self._generate_exclude_clause(exclude)
         equipment_clause = self._generate_equipment_clause(equipment)
@@ -202,7 +216,8 @@ class Recipe(Storable, Searchable):
                 'boost_mode': 'replace',
                 'query': {
                     'bool': {
-                        'must' if match_all else 'should': include_clause,
+                        'must': include_clause if match_all else [],
+                        'should': include_exact_clause if match_all and match_exact else include_clause,
                         'must_not': exclude_clause,
                         'filter': filter_clause,
                         'minimum_should_match': None if match_all else 1
@@ -213,6 +228,16 @@ class Recipe(Storable, Searchable):
         }, [{'_score': sort_params['order']}]
 
     def _refined_queries(self, include, exclude, equipment, sort_order):
+        if include:
+            query, sort = self._render_query(
+                include=include,
+                exclude=exclude,
+                equipment=equipment,
+                sort=sort_order,
+                match_exact=True
+            )
+            yield query, sort, None
+
         query, sort = self._render_query(
             include=include,
             exclude=exclude,
