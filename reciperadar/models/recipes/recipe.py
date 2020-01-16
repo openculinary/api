@@ -125,23 +125,27 @@ class Recipe(Storable, Searchable):
         return data
 
     @staticmethod
-    def _generate_include_clause(include, match_exact=False):
-        # sum the score of query ingredients found in the recipe
-        if not match_exact:
-            return [{
-                'constant_score': {
-                    'boost': pow(2, idx),
-                    'filter': {'match': {'contents': inc}}
+    def _generate_include_clause(include):
+        return [{
+            'constant_score': {
+                'boost': pow(2, idx),
+                'filter': {
+                    'match': {'contents': inc}
                 }
-            } for idx, inc in enumerate(include)]
+            }
+        } for idx, inc in enumerate(include)]
 
+    @staticmethod
+    def _generate_include_exact(include):
         return [{
             'nested': {
                 'path': 'ingredients',
                 'query': {
                     'constant_score': {
                         'boost': pow(2, idx),
-                        'filter': {'match': {'ingredients.product.product': inc}}
+                        'filter': {
+                            'match': {'ingredients.product.product': inc}
+                        }
                     }
                 }
             }
@@ -169,7 +173,9 @@ class Recipe(Storable, Searchable):
             def inv_score = 1 / (_score + 1);
             def product_count = doc.product_count.value;
             def found_count = 0;
-            for (def bits = (long) _score; bits > 0; bits &= bits - 1) { found_count++; }
+            for (def bits = (long) _score; bits > 0; bits &= bits - 1) {
+                found_count++;
+            }
             def missing_count = product_count - found_count;
 
             def missing_ratio = missing_count / product_count;
@@ -199,29 +205,31 @@ class Recipe(Storable, Searchable):
         }
         return sort_configs[sort]
 
-    def _render_query(self, include, exclude, equipment, sort, match_all=True, match_exact=False):
-        include_exact_clause = self._generate_include_clause(include, True)
+    def _render_query(self, include, exclude, equipment, sort,
+                      match_all=True, match_exact=False):
         include_clause = self._generate_include_clause(include)
+        include_exact = self._generate_include_exact(include)
         exclude_clause = self._generate_exclude_clause(exclude)
         equipment_clause = self._generate_equipment_clause(equipment)
         sort_params = self._generate_sort_params(include, sort)
 
-        filter_clause = [
+        must = include_clause if match_all else []
+        should = include_exact if match_all and match_exact else include_clause
+        must_not = exclude_clause
+        filter = equipment_clause + [
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
         ]
-        if equipment_clause:
-            filter_clause += equipment_clause
 
         return {
             'function_score': {
                 'boost_mode': 'replace',
                 'query': {
                     'bool': {
-                        'must': include_clause if match_all else [],
-                        'should': include_exact_clause if match_all and match_exact else include_clause,
-                        'must_not': exclude_clause,
-                        'filter': filter_clause,
+                        'must': must,
+                        'should': should,
+                        'must_not': must_not,
+                        'filter': filter,
                         'minimum_should_match': None if match_all else 1
                     }
                 },
