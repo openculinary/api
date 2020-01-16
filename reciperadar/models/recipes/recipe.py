@@ -130,22 +130,22 @@ class Recipe(Storable, Searchable):
         if not match_exact:
             return [{
                 'constant_score': {
-                    'boost': 1,
+                    'boost': pow(2, idx),
                     'filter': {'match': {'contents': inc}}
                 }
-            } for inc in include]
+            } for idx, inc in enumerate(include)]
 
         return [{
             'nested': {
                 'path': 'ingredients',
                 'query': {
                     'constant_score': {
-                        'boost': 1,
+                        'boost': pow(2, idx),
                         'filter': {'match': {'ingredients.product.product': inc}}
                     }
                 }
             }
-        } for inc in include]
+        } for idx, inc in enumerate(include)]
 
     @staticmethod
     def _generate_exclude_clause(exclude):
@@ -168,7 +168,9 @@ class Recipe(Storable, Searchable):
         preamble = '''
             def inv_score = 1 / (_score + 1);
             def product_count = doc.product_count.value;
-            def missing_count = product_count - _score;
+            def found_count = 0;
+            for (def bits = (long) _score; bits > 0; bits &= bits - 1) { found_count++; }
+            def missing_count = product_count - found_count;
 
             def missing_ratio = missing_count / product_count;
             def normalized_rating = doc.rating.value / 10;
