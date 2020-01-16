@@ -170,7 +170,6 @@ class Recipe(Storable, Searchable):
             return {'script': '0', 'order': 'desc'}
 
         preamble = '''
-            def inv_score = 1 / (_score + 1);
             def product_count = doc.product_count.value;
             def found_count = 0;
             for (def bits = (long) _score; bits > 0; bits &= bits - 1) {
