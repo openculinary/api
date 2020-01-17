@@ -325,6 +325,11 @@ class Recipe(Storable, Searchable):
         situation, we would prefer exact-matches on 'tofu' to appear before
         matches on 'firm tofu' which are a less precise match for the query.
 
+        In this case we can search on the 'contents' field and we will find the
+        recipe, but in order to determine whether a recipe contained an 'exact'
+        match we also need to check the 'ingredient.product.singular' field and
+        record whether the query term was present.
+
         To achieve this, we use Elasticsearch's query syntax to encode
         information about the quality of each match during search execution.
 
