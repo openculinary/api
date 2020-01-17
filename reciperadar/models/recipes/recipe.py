@@ -280,13 +280,23 @@ class Recipe(Storable, Searchable):
         * 'ingredients' mode aims to find recipes with fewest extras required
         * 'duration' mode finds recipes which can be made most quickly
 
-        In the search index, recipes contain a list of ingredients, each one
-        identified by the content of the 'ingredient.product.singular' field.
+        In the search index, each recipe contains a list of ingredients.
+        Each ingredient is indentified by the 'ingredient.product.singular'
+        field.
+
+        When users select auto-suggested ingredients, they may be shown
+        either singular or plural names - i.e. 'potato' or 'potatoes' may
+        appear in their user interface.  When the client makes a search request
+        however, it should always use the singular form - 'potato' in the
+        example above.  This allows the query to match on the singular
+        ingredient name.
 
         Recipes also content an aggregated 'contents' field, which contains all
-        of the ingredient indentifiers and also identifiers for ingredients
-        they should show up for in related searches.
+        of the ingredient identifiers and also related ingredient names.
+        Related ingredients can include ingredient ancestors (i.e. 'tortilla'
+        is an ancestor of 'flour tortilla').
 
+        Example:
         {
           'title': 'Tofu stir-fry',
           'ingredients': [
@@ -305,24 +315,27 @@ class Recipe(Storable, Searchable):
           ]
         }
 
-        Some queries are quite straightforward to understand under this model.
+        Some queries are quite straightforward under this model.
+
         A search for 'firm tofu' can simply match on any recipes with 'firm
         tofu' in the 'contents' field.
 
-        A more complex query example is a search for 'tofu', where we want
-        recipes containing 'tofu' and 'firm tofu' to appear, but with a
-        preference for exact matches on 'tofu', consistent with the query.
+        A more complex example is a search for 'tofu', where we want recipes
+        which contain either 'tofu' or 'firm tofu' to appear.  In this
+        situation, we would prefer exact-matches on 'tofu' to appear before
+        matches on 'firm tofu' which are a less precise match for the query.
 
         To achieve this, we use Elasticsearch's query syntax to encode
-        information about the quality of the matches during search execution.
-        We use `constant_score` fields to store a power-of-ten score for each
+        information about the quality of each match during search execution.
+
+        We use `constant_score` queries to store a power-of-ten score for each
         query ingredient, with the value doubled for exact matches.
 
         For example, in a query for `onion`, `tomato`, `garlic`:
 
                                 onion   tomato  tofu        score
-        recipe 1                exact   exact   partial     331
-        recipe 2                exact   no      exact       303
+        recipe 1                exact   exact   partial     300 + 30 + 1 = 331
+        recipe 2                exact   no      exact       300 +  0 + 3 = 303
 
         This allows the final sorting stage to determine - with some small
         possibility of error* - how many exact and inexact matches were
