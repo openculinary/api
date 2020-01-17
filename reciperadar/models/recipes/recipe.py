@@ -340,7 +340,8 @@ class Recipe(Storable, Searchable):
 
                                 onion   tomato  tofu        score
         recipe 1                exact   exact   partial     300 + 30 + 1 = 331
-        recipe 2                exact   no      exact       300 +  0 + 3 = 303
+        recipe 2                partial no      exact       100 +  0 + 3 = 103
+        recipe 3                exact   no      exact       300 +  0 + 3 = 303
 
         This allows the final sorting stage to determine - with some small
         possibility of error* - how many exact and inexact matches were
@@ -348,7 +349,18 @@ class Recipe(Storable, Searchable):
 
                                 score   exact_matches       all_matches
         recipe 1                331     1 + 1 + 0 = 2       1 + 1 + 1 = 3
-        recipe 2                303     1 + 0 + 1 = 2       1 + 0 + 1 = 2
+        recipe 2                103     0 + 0 + 1 = 1       1 + 0 + 1 = 2
+        recipe 3                303     1 + 0 + 1 = 2       1 + 0 + 1 = 2
+
+        At this stage we have enough information to sort the result set based
+        on the number of overall matches and to use the number of exact matches
+        as a tiebreaker within each group.
+
+        Result ranking:
+
+        - (3 matches, 2 exact) recipe 1
+        - (2 matches, 2 exact) recipe 3
+        - (2 matches, 1 exact) recipe 2
 
 
         * Inconsistent results and ranking errors can occur if an ingredient
