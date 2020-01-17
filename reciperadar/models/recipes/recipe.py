@@ -144,7 +144,7 @@ class Recipe(Storable, Searchable):
                     'constant_score': {
                         'boost': pow(10, idx) * 2,
                         'filter': {
-                            'match': {'ingredients.product.product': inc}
+                            'match': {'ingredients.product.singular': inc}
                         }
                     }
                 }
