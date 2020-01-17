@@ -273,6 +273,69 @@ class Recipe(Storable, Searchable):
             yield query, sort, 'match_any'
 
     def search(self, include, exclude, equipment, offset, limit, sort_order):
+        """
+        Searching for recipes is currently supported in three different modes:
+
+        * 'relevance' mode prioritizes matching as many ingredients as possible
+        * 'ingredients' mode aims to find recipes with fewest extras required
+        * 'duration' mode finds recipes which can be made most quickly
+
+        In the search index, recipes contain a list of ingredients, each one
+        identified by the content of the 'ingredient.product.singular' field.
+
+        Recipes also content an aggregated 'contents' field, which contains all
+        of the ingredient indentifiers and also identifiers for ingredients
+        they should show up for in related searches.
+
+        {
+          'title': 'Tofu stir-fry',
+          'ingredients': [
+            {
+              'product': {
+                'singular': 'firm tofu',
+                ...
+              }
+            },
+            ...
+          ],
+          'contents': [
+            'firm tofu',
+            'tofu',
+            ...
+          ]
+        }
+
+        Some queries are quite straightforward to understand under this model.
+        A search for 'firm tofu' can simply match on any recipes with 'firm
+        tofu' in the 'contents' field.
+
+        A more complex query example is a search for 'tofu', where we want
+        recipes containing 'tofu' and 'firm tofu' to appear, but with a
+        preference for exact matches on 'tofu', consistent with the query.
+
+        To achieve this, we use Elasticsearch's query syntax to encode
+        information about the quality of the matches during search execution.
+        We use `constant_score` fields to store a power-of-ten score for each
+        query ingredient, with the value doubled for exact matches.
+
+        For example, in a query for `onion`, `tomato`, `garlic`:
+
+                                onion   tomato  tofu        score
+        recipe 1                exact   exact   partial     331
+        recipe 2                exact   no      exact       303
+
+        This allows the final sorting stage to determine - with some small
+        possibility of error* - how many exact and inexact matches were
+        discovered for each recipe.
+
+                                score   exact_matches       all_matches
+        recipe 1                331     1 + 1 + 0 = 2       1 + 1 + 1 = 3
+        recipe 2                303     1 + 0 + 1 = 2       1 + 0 + 1 = 2
+
+
+        * Inconsistent results and ranking errors can occur if an ingredient
+          appears multiple times in a recipe, resulting in duplicate counts
+        """
         offset = max(0, offset)
         limit = max(1, limit)
         limit = min(25, limit)
