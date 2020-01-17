@@ -128,12 +128,12 @@ class Recipe(Storable, Searchable):
     def _generate_include_clause(include):
         return [{
             'constant_score': {
-                'boost': pow(2, idx),
+                'boost': pow(10, idx),
                 'filter': {
                     'match': {'contents': inc}
                 }
             }
-        } for idx, inc in enumerate(include)]
+        } for idx, inc in enumerate(reversed(include))]
 
     @staticmethod
     def _generate_include_exact(include):
@@ -142,14 +142,14 @@ class Recipe(Storable, Searchable):
                 'path': 'ingredients',
                 'query': {
                     'constant_score': {
-                        'boost': pow(2, idx),
+                        'boost': pow(10, idx) * 2,
                         'filter': {
                             'match': {'ingredients.product.product': inc}
                         }
                     }
                 }
             }
-        } for idx, inc in enumerate(include)]
+        } for idx, inc in enumerate(reversed(include))]
 
     @staticmethod
     def _generate_exclude_clause(exclude):
@@ -171,9 +171,11 @@ class Recipe(Storable, Searchable):
 
         preamble = '''
             def product_count = doc.product_count.value;
+            def exact_found_count = 0;
             def found_count = 0;
-            for (def bits = (long) _score; bits > 0; bits &= bits - 1) {
-                found_count++;
+            for (def score = (long) _score; score > 0; score /= 10) {
+                if (score % 10 > 2) exact_found_count++;
+                if (score % 10 > 0) found_count++;
             }
             def missing_count = product_count - found_count;
 
@@ -184,7 +186,7 @@ class Recipe(Storable, Searchable):
             # rank: number of ingredient matches
             # tiebreak: recipe rating
             'relevance': {
-                'script': f'{preamble} _score + normalized_rating',
+                'script': f'{preamble} (found_count * 2 + exact_found_count) + normalized_rating',
                 'order': 'desc'
             },
 
