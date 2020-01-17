@@ -177,10 +177,12 @@ class Recipe(Storable, Searchable):
                 if (score % 10 > 2) exact_found_count++;
                 if (score % 10 > 0) found_count++;
             }
+            def missing_count = product_count - found_count;
+            def exact_missing_count = product_count - exact_found_count;
 
             def relevance_score = (found_count * 2 + exact_found_count);
             def normalized_rating = doc.rating.value / 10;
-            def missing_count = product_count - found_count;
+            def missing_score = (exact_missing_count * 2 - missing_count);
             def missing_ratio = missing_count / product_count;
         '''
         sort_configs = {
@@ -194,7 +196,7 @@ class Recipe(Storable, Searchable):
             # rank: number of missing ingredients
             # tiebreak: recipe rating
             'ingredients': {
-                'script': f'{preamble} missing_count + normalized_rating',
+                'script': f'{preamble} missing_score + normalized_rating',
                 'order': 'asc'
             },
 
