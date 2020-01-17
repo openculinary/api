@@ -293,7 +293,7 @@ class Recipe(Storable, Searchable):
         the search engine to match against the singular ingredient name in the
         index.
 
-        Recipes also content an aggregated 'contents' field, which contains all
+        Recipes also contain an aggregated 'contents' field, which contains all
         of the ingredient identifiers and also their related ingredient names.
 
         Related ingredients can include ingredient ancestors (i.e. 'tortilla'
