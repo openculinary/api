@@ -278,21 +278,24 @@ class Recipe(Storable, Searchable):
 
         * 'relevance' mode prioritizes matching as many ingredients as possible
         * 'ingredients' mode aims to find recipes with fewest extras required
-        * 'duration' mode finds recipes which can be made most quickly
+        * 'duration' mode finds recipes that can be prepared most quickly
 
         In the search index, each recipe contains a list of ingredients.
         Each ingredient is indentified by the 'ingredient.product.singular'
         field.
 
-        When users select auto-suggested ingredients, they may be shown
+        When users select auto-suggested ingredients, they may be choosing from
         either singular or plural names - i.e. 'potato' or 'potatoes' may
-        appear in their user interface.  When the client makes a search request
-        however, it should always use the singular form - 'potato' in the
-        example above.  This allows the query to match on the singular
-        ingredient name.
+        appear in their user interface.
+
+        When the client makes a search request however, it should always be
+        using the singular form - 'potato' in the example above.  This allows
+        the search engine to match against the singular ingredient name in the
+        index.
 
         Recipes also content an aggregated 'contents' field, which contains all
-        of the ingredient identifiers and also related ingredient names.
+        of the ingredient identifiers and also their related ingredient names.
+
         Related ingredients can include ingredient ancestors (i.e. 'tortilla'
         is an ancestor of 'flour tortilla').
 
