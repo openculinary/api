@@ -288,10 +288,30 @@ class Recipe(Storable, Searchable):
         either singular or plural names - i.e. 'potato' or 'potatoes' may
         appear in their user interface.
 
-        When the client makes a search request however, it should always be
-        using the singular form - 'potato' in the example above.  This allows
-        the search engine to match against the singular ingredient name in the
-        index.
+        When the client makes a search request, it should always use the
+        singular ingredient name form - 'potato' in the example above.  This
+        allows the search engine to match against the corresponding singular
+        ingredient name in the recipe index.
+
+        Recipe index
+
+                            Ingredient text         Indexed ingredient name
+        recipe 1            "3 sweet potatoes"  ->  "sweet potato"
+                            "1 onion"           ->  "onion"
+                            ...
+        recipe 2            "2k onions"         ->  "onion"
+                            ...
+
+
+        End-to-end search
+
+        Autosuggest     Client query    Recipe matches  Displayed to user
+        ["onions"]  ->  ["onion"]   ->  recipe 1   ->   "3 sweet potatoes"
+                                                        "1 onion"
+                                                        ...
+                                        recipe 2   ->   "2kg onions"
+                                                        ...
+
 
         Recipes also contain an aggregated 'contents' field, which contains all
         of the ingredient identifiers and also their related ingredient names.
