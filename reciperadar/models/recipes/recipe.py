@@ -207,8 +207,7 @@ class Recipe(Storable, Searchable):
         }
         return sort_configs[sort]
 
-    def _render_query(self, include, exclude, equipment, sort,
-                      match_all=True, match_exact=False):
+    def _render_query(self, include, exclude, equipment, sort, match_all=True):
         include_clause = self._generate_include_clause(include)
         include_exact = self._generate_include_exact(include)
         exclude_clause = self._generate_exclude_clause(exclude)
@@ -216,7 +215,7 @@ class Recipe(Storable, Searchable):
         sort_params = self._generate_sort_params(include, sort)
 
         must = include_clause if match_all else []
-        should = include_exact if match_all and match_exact else include_clause
+        should = include_exact if match_all else include_clause
         must_not = exclude_clause
         filter = equipment_clause + [
             {'range': {'time': {'gte': 5}}},
@@ -240,16 +239,6 @@ class Recipe(Storable, Searchable):
         }, [{'_score': sort_params['order']}]
 
     def _refined_queries(self, include, exclude, equipment, sort_order):
-        if include:
-            query, sort = self._render_query(
-                include=include,
-                exclude=exclude,
-                equipment=equipment,
-                sort=sort_order,
-                match_exact=True
-            )
-            yield query, sort, None
-
         query, sort = self._render_query(
             include=include,
             exclude=exclude,
