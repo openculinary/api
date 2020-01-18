@@ -175,7 +175,7 @@ class Recipe(Storable, Searchable):
     def _generate_sort_params(include, sort):
         # if no ingredients are specified, we may be able to short-cut sorting
         if not include and sort != 'duration':
-            return [{'rating': {'order': 'desc'}}]
+            return {'script': 'doc.rating.value', 'order': 'desc'}
 
         preamble = '''
             def product_count = doc.product_count.value;
