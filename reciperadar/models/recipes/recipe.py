@@ -19,6 +19,7 @@ class Recipe(Storable, Searchable):
     id = Column(String, primary_key=True)
     title = Column(String)
     src = Column(String)
+    dst = Column(String)
     domain = Column(String)
     image_src = Column(String)
     time = Column(Integer)
