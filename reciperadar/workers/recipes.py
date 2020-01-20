@@ -39,7 +39,10 @@ def find_earliest_crawl(session, url):
     for crawl in crawls:
         if crawl.url == url:
             continue
+        if not crawl.crawled_at:
+            continue
         result = result or crawl
+        result = crawl if not result.crawled_at else result
         result = crawl if crawl.crawled_at < result.crawled_at else result
     if result:
         return find_earliest_crawl(session, result.url) or result
