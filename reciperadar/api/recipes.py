@@ -6,6 +6,7 @@ from sqlalchemy.sql.expression import func
 from reciperadar import app
 from reciperadar.models.events.search import SearchEvent
 from reciperadar.models.recipes import Recipe
+from reciperadar.search.recipes import RecipeSearch
 from reciperadar.services.database import Database
 from reciperadar.utils.decorators import internal
 from reciperadar.workers.events import store_event
@@ -36,7 +37,15 @@ def recipes():
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', default='ingredients')
-    results = Recipe().search(include, exclude, equipment, offset, limit, sort)
+
+    results = RecipeSearch().query(
+        include=include,
+        exclude=exclude,
+        equipment=equipment,
+        offset=offset,
+        limit=limit,
+        sort=sort
+    )
 
     user_agent = request.headers.get('user-agent')
     suspected_bot = ua_parser(user_agent or '').is_bot

@@ -1,14 +1,14 @@
 from mock import patch
 
-from reciperadar.models.recipes import Recipe
+from reciperadar.search.recipes import RecipeSearch
 
 
 @patch('werkzeug.datastructures.Headers.get')
 @patch('reciperadar.api.recipes.recrawl_search.delay')
 @patch('reciperadar.api.recipes.store_event')
-@patch.object(Recipe, 'search')
-def test_search_user_agent_optional(search, store, recrawl, get, client):
-    search.return_value = {'results': [], 'total': 0}
+@patch.object(RecipeSearch, 'query')
+def test_search_user_agent_optional(query, store, recrawl, get, client):
+    query.return_value = {'results': [], 'total': 0}
     get.return_value = None
 
     response = client.get('/api/recipes/search', headers={'user-agent': None})
@@ -18,9 +18,9 @@ def test_search_user_agent_optional(search, store, recrawl, get, client):
 
 @patch('reciperadar.api.recipes.recrawl_search.delay')
 @patch('reciperadar.api.recipes.store_event')
-@patch.object(Recipe, 'search')
-def test_search_recrawling(search, store, recrawl, client):
-    search.return_value = {'results': [], 'total': 0}
+@patch.object(RecipeSearch, 'query')
+def test_search_recrawling(query, store, recrawl, client):
+    query.return_value = {'results': [], 'total': 0}
 
     response = client.get('/api/recipes/search', headers={'user-agent': None})
 
@@ -30,9 +30,9 @@ def test_search_recrawling(search, store, recrawl, client):
 
 @patch('reciperadar.api.recipes.recrawl_search.delay')
 @patch('reciperadar.api.recipes.store_event')
-@patch.object(Recipe, 'search')
-def test_bot_search(search, store, recrawl, client):
-    search.return_value = {'results': [], 'total': 0}
+@patch.object(RecipeSearch, 'query')
+def test_bot_search(query, store, recrawl, client):
+    query.return_value = {'results': [], 'total': 0}
 
     user_agent = (
         'Mozilla/5.0+',
