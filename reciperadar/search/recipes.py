@@ -123,6 +123,17 @@ class RecipeSearch(QueryRepository):
         }, [{'_score': sort_params['order']}]
 
     def _refined_queries(self, include, exclude, equipment, sort_order):
+        # Provide an 'empty query' hint
+        if not include and not exclude and not equipment:
+            query, sort = self._render_query(
+                include=include,
+                exclude=exclude,
+                equipment=equipment,
+                sort=sort_order
+            )
+            yield sort, sort, 'empty_query'
+            return
+
         query, sort = self._render_query(
             include=include,
             exclude=exclude,
