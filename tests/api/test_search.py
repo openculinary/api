@@ -4,8 +4,8 @@ from reciperadar.models.recipes import Recipe
 
 
 @patch('werkzeug.datastructures.Headers.get')
-@patch('reciperadar.api.search.recrawl_search.delay')
-@patch('reciperadar.api.search.store_event')
+@patch('reciperadar.api.recipes.recrawl_search.delay')
+@patch('reciperadar.api.recipes.store_event')
 @patch.object(Recipe, 'search')
 def test_search_user_agent_optional(search, store, recrawl, get, client):
     search.return_value = {'results': [], 'total': 0}
@@ -16,8 +16,8 @@ def test_search_user_agent_optional(search, store, recrawl, get, client):
     assert response.status_code == 200
 
 
-@patch('reciperadar.api.search.recrawl_search.delay')
-@patch('reciperadar.api.search.store_event')
+@patch('reciperadar.api.recipes.recrawl_search.delay')
+@patch('reciperadar.api.recipes.store_event')
 @patch.object(Recipe, 'search')
 def test_search_recrawling(search, store, recrawl, client):
     search.return_value = {'results': [], 'total': 0}
@@ -28,8 +28,8 @@ def test_search_recrawling(search, store, recrawl, client):
     assert recrawl.called is True
 
 
-@patch('reciperadar.api.search.recrawl_search.delay')
-@patch('reciperadar.api.search.store_event')
+@patch('reciperadar.api.recipes.recrawl_search.delay')
+@patch('reciperadar.api.recipes.store_event')
 @patch.object(Recipe, 'search')
 def test_bot_search(search, store, recrawl, client):
     search.return_value = {'results': [], 'total': 0}
