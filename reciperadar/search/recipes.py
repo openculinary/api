@@ -44,11 +44,7 @@ class RecipeSearch(QueryRepository):
         ]
 
     @staticmethod
-    def _generate_sort_params(include, sort):
-        # if no ingredients are specified, we may be able to short-cut sorting
-        if not include and sort != 'duration':
-            return {'script': 'doc.rating.value', 'order': 'desc'}
-
+    def sort_methods():
         preamble = '''
             def product_count = doc.product_count.value;
             def exact_found_count = 0;
@@ -65,7 +61,7 @@ class RecipeSearch(QueryRepository):
             def missing_score = (exact_missing_count * 2 - missing_count);
             def missing_ratio = missing_count / product_count;
         '''
-        sort_configs = {
+        return {
             # rank: number of ingredient matches
             # tiebreak: recipe rating
             'relevance': {
@@ -87,7 +83,12 @@ class RecipeSearch(QueryRepository):
                 'order': 'asc'
             },
         }
-        return sort_configs[sort]
+
+    def _generate_sort_params(self, include, sort):
+        # if no ingredients are specified, we may be able to short-cut sorting
+        if not include and sort != 'duration':
+            return {'script': 'doc.rating.value', 'order': 'desc'}
+        return self.sort_methods[sort]
 
     def _render_query(self, include, exclude, equipment, sort, match_all=True):
         include_clause = self._generate_include_clause(include)
