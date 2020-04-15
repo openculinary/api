@@ -128,7 +128,7 @@ class RecipeSearch(QueryRepository):
 
     def _refined_queries(self, include, exclude, equipment, sort):
         # Provide an 'empty query' hint
-        if not include and not exclude and not equipment:
+        if not include and not exclude and not equipment and not sort:
             query, sort_method = self._render_query(
                 include=include,
                 exclude=exclude,
