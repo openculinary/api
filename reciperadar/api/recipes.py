@@ -38,6 +38,9 @@ def recipes():
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', default='ingredients')
 
+    if sort and sort not in RecipeSearch.sort_methods():
+        return abort(400)
+
     results = RecipeSearch().query(
         include=include,
         exclude=exclude,
