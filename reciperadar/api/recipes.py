@@ -47,7 +47,7 @@ def recipes():
         equipment=equipment,
         offset=offset,
         limit=limit,
-        sort_order=sort
+        sort=sort
     )
 
     user_agent = request.headers.get('user-agent')

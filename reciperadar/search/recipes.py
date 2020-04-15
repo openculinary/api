@@ -84,8 +84,8 @@ class RecipeSearch(QueryRepository):
             },
         }
 
-    def _generate_sort_params(self, include, sort):
-        # set the default sort order
+    def _generate_sort_method(self, include, sort):
+        # set the default sort method
         if not sort:
             sort = 'ingredients'
         # if no ingredients are specified, we may be able to short-cut sorting
@@ -98,7 +98,7 @@ class RecipeSearch(QueryRepository):
         include_exact = self._generate_include_exact(include)
         exclude_clause = self._generate_exclude_clause(exclude)
         equipment_clause = self._generate_equipment_clause(equipment)
-        sort_params = self._generate_sort_params(include, sort)
+        sort_params = self._generate_sort_method(include, sort)
 
         must = include_clause if match_all else []
         should = include_exact if match_all else include_clause
@@ -126,39 +126,39 @@ class RecipeSearch(QueryRepository):
             }
         }, [{'_score': sort_params['order']}]
 
-    def _refined_queries(self, include, exclude, equipment, sort_order):
-        query, sort = self._render_query(
+    def _refined_queries(self, include, exclude, equipment, sort):
+        query, sort_method = self._render_query(
             include=include,
             exclude=exclude,
             equipment=equipment,
-            sort=sort_order
+            sort=sort
         )
-        yield query, sort, None
+        yield query, sort_method, None
 
         item_count = len(include)
         if item_count > 3:
             for _ in range(item_count):
                 removed = include.pop(0)
-                query, sort = self._render_query(
+                query, sort_method = self._render_query(
                     include=include,
                     exclude=exclude,
                     equipment=equipment,
-                    sort=sort_order
+                    sort=sort
                 )
-                yield query, sort, f'removed:{removed}'
+                yield query, sort_method, f'removed:{removed}'
                 include.append(removed)
 
         if item_count > 1:
-            query, sort = self._render_query(
+            query, sort_method = self._render_query(
                 include=include,
                 exclude=exclude,
                 equipment=equipment,
-                sort=sort_order,
+                sort=sort,
                 match_all=False
             )
-            yield query, sort, 'match_any'
+            yield query, sort_method, 'match_any'
 
-    def query(self, include, exclude, equipment, offset, limit, sort_order):
+    def query(self, include, exclude, equipment, offset, limit, sort):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -283,16 +283,16 @@ class RecipeSearch(QueryRepository):
             include=include,
             exclude=exclude,
             equipment=equipment,
-            sort_order=sort_order
+            sort=sort
         )
-        for query, sort, refinement in queries:
+        for query, sort_method, refinement in queries:
             results = self.es.search(
                 index='recipes',
                 body={
                     'from': offset,
                     'size': limit,
                     'query': query,
-                    'sort': sort,
+                    'sort': sort_method,
                 }
             )
             if results['hits']['total']['value']:
