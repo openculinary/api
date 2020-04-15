@@ -133,7 +133,7 @@ class RecipeSearch(QueryRepository):
                 include=include,
                 exclude=exclude,
                 equipment=equipment,
-                sort=sort_order
+                sort=sort
             )
             yield query, sort_method, 'empty_query'
             return
