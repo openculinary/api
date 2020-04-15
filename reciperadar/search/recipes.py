@@ -85,6 +85,9 @@ class RecipeSearch(QueryRepository):
         }
 
     def _generate_sort_params(self, include, sort):
+        # set the default sort order
+        if not sort:
+            sort = 'ingredients'
         # if no ingredients are specified, we may be able to short-cut sorting
         if not include and sort != 'duration':
             return {'script': 'doc.rating.value', 'order': 'desc'}
