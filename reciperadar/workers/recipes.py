@@ -78,9 +78,12 @@ def crawl_recipe(url):
 
     session = Database().get_session()
 
-    # Store recipe with first-known URL as source and latest URL as destination
+    # Find any more-recent crawls of this URL, allowing detection of duplicates
     latest_crawl = find_latest_crawl(session, url)
+
+    # Find the first-known crawl for the latest URL, and consider it the origin
     earliest_crawl = find_earliest_crawl(session, latest_crawl.url)
+
     recipe_data['src'] = earliest_crawl.url
     recipe_data['dst'] = latest_crawl.url
     recipe = Recipe.from_doc(recipe_data)
