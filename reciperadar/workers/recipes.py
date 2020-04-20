@@ -83,7 +83,7 @@ def find_latest_crawl(session, url):
             previous_step.c.url
         )
         .filter_by(url=previous_step.c.resolves_to)
-        .filter(CrawlURL.url != previous_step.c.url)
+        .filter(CrawlURL.resolves_to != previous_step.c.resolves_to)
     )
 
     return (
