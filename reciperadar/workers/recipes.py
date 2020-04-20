@@ -36,7 +36,7 @@ def process_recipe(recipe_id):
 def find_earliest_crawl(session, url):
     return session.query(CrawlURL) \
         .filter_by(resolves_to=url) \
-        .filter(CrawlURL.crawled_at.is_not(None)) \
+        .filter(CrawlURL.crawled_at.isnot(None)) \
         .order_by(CrawlURL.crawled_at.asc()) \
         .one()
 
