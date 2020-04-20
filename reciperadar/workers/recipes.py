@@ -126,10 +126,10 @@ def crawl_recipe(url):
     latest_crawl = find_latest_crawl(session, url)
 
     # Find the first-known crawl for the latest URL, and consider it the origin
-    earliest_crawl = find_earliest_crawl(session, latest_crawl.url)
+    earliest_crawl = find_earliest_crawl(session, latest_crawl.resolves_to)
 
     recipe_data['src'] = earliest_crawl.url
-    recipe_data['dst'] = latest_crawl.url
+    recipe_data['dst'] = latest_crawl.resolves_to
     recipe = Recipe.from_doc(recipe_data)
 
     session.query(Recipe).filter_by(id=recipe.id).delete()
