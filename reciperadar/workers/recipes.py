@@ -41,6 +41,14 @@ def find_earliest_crawl(session, url):
         .first()
 
 
+def find_latest_crawl(session, url):
+    return session.query(CrawlURL) \
+        .filter_by(resolves_to=url) \
+        .filter(CrawlURL.crawled_at.isnot(None)) \
+        .order_by(CrawlURL.crawled_at.desc()) \
+        .first()
+
+
 @celery.task(queue='crawl_recipe')
 def crawl_recipe(url):
     session = Database().get_session()
@@ -72,8 +80,9 @@ def crawl_recipe(url):
 
     # Store recipe with first-known URL as source and latest URL as destination
     earliest_crawl = find_earliest_crawl(session, url)
+    latest_crawl = find_latest_crawl(session, url)
     recipe_data['src'] = earliest_crawl.url
-    recipe_data['dst'] = url
+    recipe_data['dst'] = latest_crawl.url
     recipe = Recipe.from_doc(recipe_data)
 
     session.query(Recipe).filter_by(id=recipe.id).delete()
