@@ -79,8 +79,8 @@ def crawl_recipe(url):
     session = Database().get_session()
 
     # Store recipe with first-known URL as source and latest URL as destination
-    earliest_crawl = find_earliest_crawl(session, url)
     latest_crawl = find_latest_crawl(session, url)
+    earliest_crawl = find_earliest_crawl(session, latest_crawl.url)
     recipe_data['src'] = earliest_crawl.url
     recipe_data['dst'] = latest_crawl.url
     recipe = Recipe.from_doc(recipe_data)
