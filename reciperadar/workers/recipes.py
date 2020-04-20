@@ -65,11 +65,32 @@ def find_earliest_crawl(session, url):
 
 
 def find_latest_crawl(session, url):
-    return session.query(CrawlURL) \
-        .filter_by(resolves_to=url) \
-        .filter(CrawlURL.crawled_at.isnot(None)) \
-        .order_by(CrawlURL.crawled_at.desc()) \
+    latest_crawl = (
+        session.query(
+            CrawlURL.crawled_at,
+            CrawlURL.url,
+            CrawlURL.resolves_to
+        )
+        .filter_by(resolves_to=url)
+        .cte(recursive=True)
+    )
+
+    previous_step = aliased(latest_crawl)
+    latest_crawl = latest_crawl.union_all(
+        session.query(
+            CrawlURL.crawled_at,
+            CrawlURL.url,
+            previous_step.c.url
+        )
+        .filter_by(url=previous_step.c.resolves_to)
+        .filter(CrawlURL.url != previous_step.c.url)
+    )
+
+    return (
+        session.query(latest_crawl)
+        .order_by(latest_crawl.c.crawled_at.desc())
         .first()
+    )
 
 
 @celery.task(queue='crawl_recipe')
