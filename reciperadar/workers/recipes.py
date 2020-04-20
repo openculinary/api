@@ -1,3 +1,5 @@
+from sqlalchemy.orm import aliased
+
 from reciperadar.models.recipes import Recipe
 from reciperadar.models.url import CrawlURL, RecipeURL
 from reciperadar.services.database import Database
@@ -34,11 +36,32 @@ def process_recipe(recipe_id):
 
 
 def find_earliest_crawl(session, url):
-    return session.query(CrawlURL) \
-        .filter_by(resolves_to=url) \
-        .filter(CrawlURL.crawled_at.isnot(None)) \
-        .order_by(CrawlURL.crawled_at.asc()) \
+    earliest_crawl = (
+        session.query(
+            CrawlURL.crawled_at,
+            CrawlURL.url,
+            CrawlURL.resolves_to
+        )
+        .filter_by(resolves_to=url)
+        .cte(recursive=True)
+    )
+
+    previous_step = aliased(earliest_crawl)
+    earliest_crawl = earliest_crawl.union_all(
+        session.query(
+            CrawlURL.crawled_at,
+            CrawlURL.url,
+            previous_step.c.url
+        )
+        .filter_by(resolves_to=previous_step.c.url)
+        .filter(CrawlURL.resolves_to != previous_step.c.resolves_to)
+    )
+
+    return (
+        session.query(earliest_crawl)
+        .order_by(earliest_crawl.c.crawled_at.asc())
         .first()
+    )
 
 
 def find_latest_crawl(session, url):
