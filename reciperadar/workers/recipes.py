@@ -37,8 +37,6 @@ def find_earliest_crawl(session, url):
     result = None
     crawls = session.query(CrawlURL).filter_by(resolves_to=url)
     for crawl in crawls:
-        if crawl.url == url:
-            continue
         if not crawl.crawled_at:
             continue
         result = result or crawl
