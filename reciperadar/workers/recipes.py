@@ -124,9 +124,15 @@ def crawl_recipe(url):
 
     # Find any more-recent crawls of this URL, allowing detection of duplicates
     latest_crawl = find_latest_crawl(session, url)
+    if not latest_crawl:
+        print(f'Failed to find latest crawl for url={url}')
+        return
 
     # Find the first-known crawl for the latest URL, and consider it the origin
     earliest_crawl = find_earliest_crawl(session, latest_crawl.resolves_to)
+    if not earliest_crawl:
+        print(f'Failed to find earliest crawl for url={url}')
+        return
 
     recipe_data['src'] = earliest_crawl.url
     recipe_data['dst'] = latest_crawl.resolves_to
