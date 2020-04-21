@@ -122,6 +122,60 @@ def crawl_recipe(url):
 
     session = Database().get_session()
 
+    '''
+    Due to the fluid nature of the world wide web, a recipe that exists at an
+    original URL may later be redirected to another location.
+
+    These relocations may occur multiple times, and it's difficult to predict
+    the times at which RecipeRadar will crawl the recipe at each location.
+
+    What this ends up creating is a URL redirection graph.  We can only update
+    the links in the graph for a URL when we crawl it.
+
+    RecipeRadar makes the assumption that at any given point in time, there
+    will only be a single 'destination' (final landing URL) for each recipe.
+
+    Here's an example of a complicated scenario:
+
+    <- 5 days ago  |  now ->
+
+      A-----\
+             B-----D-----E
+       C----------/
+
+
+    RecipeRadar has learned about the recipe via two different paths, 'A'
+    and 'C'.
+
+    Initially 'A' redirected to page 'B', but by the time we crawled it from
+    'C', the website owner had updated both A and B to point to location 'D'.
+
+    The website owner made one further change to clear up the URL format and
+    now the final landing URL is 'E'.
+
+
+    In order to de-duplicate recipes in the RecipeRadar search engine, we use
+    the oldest-known-URL for each recipe.  We believe this will be the most
+    stable ID scheme, since it cannot be changed by the website owner, and we
+    have a record of it.
+
+    Recipe hyperlinks displayed to users will contain the most-recent-known
+    recipe URL.  This should reduce the number of redirects that the user
+    has to follow in order to reach the destination, and ensures that they are
+    taken to the most up-to-date URL format that we know about.
+
+
+    To implement this algorithm in code, we first navigate forwards in time
+    to find the 'most recent' destination for each input URL.  For example,
+    given the graph above, both 'A' and 'C' will navigate forwards to 'E'.
+    This is implemented by the `find_latest_crawl` method.
+
+    Once we have our current-best target URL, we then trace backwards in time
+    to find the earliest graph node that can reach the target.  We use this as
+    our source URL, and this is implemented by the `find_earliest_crawl`
+    method.
+    '''
+
     # Find any more-recent crawls of this URL, allowing detection of duplicates
     latest_crawl = find_latest_crawl(session, url)
     if not latest_crawl:
