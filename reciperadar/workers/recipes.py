@@ -42,7 +42,7 @@ def find_earliest_crawl(session, url):
             CrawlURL.url,
             CrawlURL.resolves_to
         )
-        .filter_by(resolves_to=url)
+        .filter_by(url=url)
         .cte(recursive=True)
     )
 
@@ -71,7 +71,7 @@ def find_latest_crawl(session, url):
             CrawlURL.url,
             CrawlURL.resolves_to
         )
-        .filter_by(resolves_to=url)
+        .filter_by(url=url)
         .cte(recursive=True)
     )
 
