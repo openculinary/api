@@ -123,11 +123,12 @@ def crawl_recipe(url):
     session = Database().get_session()
 
     '''
-    Due to the fluid nature of the world wide web, a recipe that exists at an
-    original URL may later be redirected to another location.
+    Due to the fluid nature of the world wide web, a vist to a specific URL
+    that previously contained recipe contents may result in a redirect to a
+    different web address.
 
-    These relocations may occur multiple times, and it's difficult to predict
-    the times at which RecipeRadar will crawl the recipe at each location.
+    These relocations can occur multiple times, and it's difficult to predict
+    the times at which RecipeRadar will crawl the recipe at each address.
 
     What this ends up creating is a URL redirection graph.  We can only update
     the links in the graph for a URL when we crawl it.
