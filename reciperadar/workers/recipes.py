@@ -137,7 +137,7 @@ def crawl_recipe(url):
 
     Here's an example of a complicated scenario:
 
-    <- 5 days ago  |  now ->
+    <- past        future ->
 
       A-----\
              B-----D-----E
@@ -147,17 +147,20 @@ def crawl_recipe(url):
     RecipeRadar has learned about the recipe via two different paths, 'A'
     and 'C'.
 
-    Initially 'A' redirected to page 'B', but by the time we crawled it from
-    'C', the website owner had updated both A and B to point to location 'D'.
+    Initially 'A' redirected to page 'B', and at the time we crawled it using
+    address 'C', the website owner had updated A, B and C to point to an
+    updated location 'D'.
 
-    The website owner made one further change to clear up the URL format and
-    now the final landing URL is 'E'.
-
+    The graph includes one further change made by the website owner, who added 
+    a redirect from 'D' to 'E' in order to use a cleaner URL.
 
     In order to de-duplicate recipes in the RecipeRadar search engine, we use
-    the oldest-known-URL for each recipe.  We believe this will be the most
-    stable ID scheme, since it cannot be changed by the website owner, and we
-    have a record of it.
+    the oldest-known-URL for each recipe as the 'source' location, and we
+    only include one recipe per source in the search engine.
+
+    We believe the oldest-known-URL will be the most stable source address,
+    since it cannot be changed by the website owner, and we have a record of
+    it.
 
     Recipe hyperlinks displayed to users will contain the most-recent-known
     recipe URL.  This should reduce the number of redirects that the user
