@@ -60,6 +60,7 @@ class IngredientProduct(Storable):
         return {
             'type': 'product',
             'id': self.product_id,
+            'product': self.product,
             'value': self.product,
             'category': self.category,
             'singular': self.singular,
