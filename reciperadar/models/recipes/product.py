@@ -59,6 +59,7 @@ class IngredientProduct(Storable):
     def to_dict(self, include):
         return {
             'type': 'product',
+            'id': self.product_id,
             'value': self.product,
             'category': self.category,
             'singular': self.singular,
