@@ -156,6 +156,7 @@ class RecipeIngredient(Storable, Searchable):
                 product=suggestion_doc['key'],
                 category=category,
                 singular=singular,
+                plural=plural,
             ))
 
         suggestions.sort(key=lambda s: (
@@ -166,5 +167,6 @@ class RecipeIngredient(Storable, Searchable):
         return [{
             'product': suggestion.product,
             'category': suggestion.category,
-            'singular': suggestion.singular
+            'singular': suggestion.singular,
+            'plural': suggestion.plural,
         } for suggestion in suggestions]
