@@ -148,11 +148,14 @@ class RecipeIngredient(Storable, Searchable):
             plural_wins = plural_count > total_count - plural_count
 
             category_docs = result['category']['buckets']
+            singular_docs = result['singular']['buckets']
+            plural_docs = result['plural']['buckets']
+
             suggestion_doc = plural_docs[0] if plural_wins else result
             suggestions.append(IngredientProduct(
                 product=suggestion_doc['key'],
                 category=category_docs[0]['key'] if category_docs else None,
-                singular=result['key']
+                singular=singular_docs[0]['key'] if singular_docs else None,
             ))
 
         suggestions.sort(key=lambda s: (
