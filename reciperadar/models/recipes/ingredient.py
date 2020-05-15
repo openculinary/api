@@ -113,6 +113,18 @@ class RecipeIngredient(Storable, Searchable):
                             'field': 'ingredients.product.category',
                             'size': 1
                           }
+                        },
+                        'singular': {
+                          'terms': {
+                            'field': 'ingredients.product.singular',
+                            'size': 1
+                          }
+                        },
+                        'plural': {
+                          'terms': {
+                            'field': 'ingredients.product.plural',
+                            'size': 1
+                          }
                         }
                       }
                     }
