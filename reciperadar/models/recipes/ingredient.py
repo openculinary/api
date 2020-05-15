@@ -137,11 +137,13 @@ class RecipeIngredient(Storable, Searchable):
             plural_count = result['plurality']['doc_count']
             plural_wins = plural_count > total_count - plural_count
 
+            product_id = result['key']
             category = (result['category']['buckets'] or [{}])[0].get('key')
             singular = (result['singular']['buckets'] or [{}])[0].get('key')
             plural = (result['plural']['buckets'] or [{}])[0].get('key')
 
             suggestions.append(IngredientProduct(
+                product_id=product_id,
                 product=plural if plural_wins else singular,
                 category=category,
                 singular=singular,
@@ -154,6 +156,7 @@ class RecipeIngredient(Storable, Searchable):
             len(s.product)),  # sort remaining matches by length
         )
         return [{
+            'product_id': suggestion.product_id,
             'product': suggestion.product,
             'category': suggestion.category,
             'singular': suggestion.singular,
