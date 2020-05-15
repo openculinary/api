@@ -96,15 +96,6 @@ class RecipeIngredient(Storable, Searchable):
                         'plurality': {
                           'filter': {
                             'match': {'ingredients.product.is_plural': True}
-                          },
-                          'aggregations': {
-                            # return the plural word form in the results
-                            'plural': {
-                              'terms': {
-                                'field': 'ingredients.product.plural',
-                                'size': 1
-                              }
-                            }
                           }
                         },
                         # retrieve a category for each ingredient
@@ -144,7 +135,6 @@ class RecipeIngredient(Storable, Searchable):
         for result in results:
             total_count = result['doc_count']
             plural_count = result['plurality']['doc_count']
-            plural_docs = result['plurality']['plural']['buckets']
             plural_wins = plural_count > total_count - plural_count
 
             category = (result['category']['buckets'] or [{}])[0].get('key')
