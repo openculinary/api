@@ -133,8 +133,7 @@ class RecipeSearch(QueryRepository):
         )
         yield query, sort_method, None
 
-        item_count = len(include)
-        if item_count > 3:
+        if include:
             for min_include_match in range(item_count, 1, -1):
                 query, sort_method = self._render_query(
                     include=include,
@@ -145,7 +144,6 @@ class RecipeSearch(QueryRepository):
                 )
                 yield query, sort_method, f'partial'
 
-        if item_count > 1:
             query, sort_method = self._render_query(
                 include=include,
                 exclude=exclude,
