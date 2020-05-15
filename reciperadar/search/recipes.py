@@ -82,7 +82,7 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
-    def _render_query(self, include, exclude, equipment, sort, minimum_should_match=None):
+    def _render_query(self, include, exclude, equipment, sort, min_include_match=None):
         include_clause = self._generate_include_clause(include)
         exclude_clause = self._generate_exclude_clause(exclude)
         equipment_clause = self._generate_equipment_clause(equipment)
@@ -96,7 +96,7 @@ class RecipeSearch(QueryRepository):
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
         ]
-        minimum_should_match = minimum_should_match or len(should)
+        min_include_match = min_include_match or len(should)
 
         return {
             'function_score': {
@@ -106,7 +106,7 @@ class RecipeSearch(QueryRepository):
                         'should': should,
                         'must_not': must_not,
                         'filter': filter,
-                        'minimum_should_match': minimum_should_match
+                        'minimum_should_match': min_include_match,
                     }
                 },
                 'script_score': {'script': {'source': sort_params['script']}}
@@ -135,13 +135,13 @@ class RecipeSearch(QueryRepository):
 
         item_count = len(include)
         if item_count > 3:
-            for minimum_should_match in range(item_count, 1, -1):
+            for min_include_match in range(item_count, 1, -1):
                 query, sort_method = self._render_query(
                     include=include,
                     exclude=exclude,
                     equipment=equipment,
                     sort=sort,
-                    minimum_should_match=minimum_should_match
+                    min_include_match=min_include_match
                 )
                 yield query, sort_method, f'partial'
 
@@ -151,7 +151,7 @@ class RecipeSearch(QueryRepository):
                 exclude=exclude,
                 equipment=equipment,
                 sort=sort,
-                minimum_should_match=0
+                min_include_match=0
             )
             yield query, sort_method, 'match_any'
 
