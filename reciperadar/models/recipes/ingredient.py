@@ -151,9 +151,8 @@ class RecipeIngredient(Storable, Searchable):
             singular = (result['singular']['buckets'] or [{}])[0].get('key')
             plural = (result['plural']['buckets'] or [{}])[0].get('key')
 
-            suggestion_doc = plural_docs[0] if plural_wins else result
             suggestions.append(IngredientProduct(
-                product=suggestion_doc['key'],
+                product=plural if plural_wins else singular,
                 category=category,
                 singular=singular,
                 plural=plural,
