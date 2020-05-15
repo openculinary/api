@@ -85,9 +85,9 @@ class RecipeIngredient(Storable, Searchable):
                   },
                   'aggregations': {
                     # retrieve the top products in singular pluralization
-                    'product': {
+                    'product_id': {
                       'terms': {
-                        'field': 'ingredients.product.singular',
+                        'field': 'ingredients.product.product_id',
                         'min_doc_count': 5,
                         'size': 10
                       },
@@ -126,7 +126,7 @@ class RecipeIngredient(Storable, Searchable):
           }
         }
         results = self.es.search(index=self.noun, body=query)['aggregations']
-        results = results['ingredients']['products']['product']['buckets']
+        results = results['ingredients']['products']['product_id']['buckets']
 
         # iterate through the suggestions and determine whether to display
         # the singular or plural form of the word based on how frequently
