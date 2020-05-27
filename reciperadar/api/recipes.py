@@ -34,7 +34,7 @@ def recipe_view(recipe_id):
 
 
 @app.route('/api/recipes/search')
-def recipes():
+def recipe_search():
     include = request.args.getlist('include[]')
     exclude = request.args.getlist('exclude[]')
     equipment = request.args.getlist('equipment[]')
