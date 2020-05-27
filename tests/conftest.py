@@ -16,6 +16,7 @@ def raw_recipe_hit():
         "_id": "random-id",
         "_score": 10.04635,
         "_source": {
+            "id": "example_id",
             "title": "Test Recipe",
             "directions": [
                 {

@@ -1,4 +1,3 @@
-from pymmh3 import hash_bytes
 from sqlalchemy import (
     Column,
     DateTime,
@@ -63,10 +62,8 @@ class Recipe(Storable, Searchable):
 
     @staticmethod
     def from_doc(doc):
-        src_hash = hash_bytes(doc['src']).encode('utf-8')
-        recipe_id = doc.get('id') or Recipe.generate_id(src_hash)
         return Recipe(
-            id=recipe_id,
+            id=doc['id'],
             title=doc['title'],
             src=doc['src'],
             dst=doc.get('dst'),  # TODO: Backwards compatibility; update
