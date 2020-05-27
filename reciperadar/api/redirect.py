@@ -12,10 +12,14 @@ def recipe_redirect(recipe_id):
     if not recipe:
         return abort(404)
 
-    store_event(RedirectEvent(
+    redirect_event = RedirectEvent(
         recipe_id=recipe.id,
         domain=recipe.domain,
         src=recipe.src
-    ))
+    )
+    store_event.delay(
+        event_table=redirect_event.__tablename__,
+        event_data=redirect_event.to_doc()
+    )
 
     return redirect(recipe.src, code=301)

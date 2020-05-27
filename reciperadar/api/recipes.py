@@ -60,8 +60,8 @@ def recipe_search():
     # Perform a recrawl for the search to find any new/missing recipes
     recrawl_search.delay(include, exclude, equipment, offset)
 
-    # TODO: Once 'event' is json serializable: switch to store_event.delay
-    store_event(SearchEvent(
+    # Log a search event
+    search_event = SearchEvent(
         suspected_bot=suspected_bot,
         include=include,
         exclude=exclude,
@@ -71,7 +71,11 @@ def recipe_search():
         sort=sort,
         results_ids=[result['id'] for result in results['results']],
         results_total=results['total']
-    ))
+    )
+    store_event.delay(
+        event_table=search_event.__tablename__,
+        event_data=search_event.to_doc()
+    )
 
     return jsonify(results)
 
