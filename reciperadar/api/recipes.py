@@ -5,7 +5,6 @@ from reciperadar import app
 from reciperadar.models.events.search import SearchEvent
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.recipes import RecipeSearch
-from reciperadar.services.database import Database
 from reciperadar.utils.decorators import internal
 from reciperadar.workers.events import store_event
 from reciperadar.workers.recipes import crawl_url, index_recipe
@@ -15,16 +14,10 @@ from reciperadar.workers.searches import recrawl_search
 @app.route('/api/recipes/<recipe_id>')
 @internal
 def recipe_get(recipe_id):
-    session = Database().get_session()
-    recipe = session.query(Recipe).get(recipe_id)
+    recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
-        session.close()
         return abort(404)
-
-    response = recipe.to_doc()
-    session.close()
-
-    return jsonify(response)
+    return jsonify(recipe.to_doc())
 
 
 @app.route('/api/recipes/search')
