@@ -2,7 +2,6 @@ from flask import abort, jsonify, request
 from user_agents import parse as ua_parser
 
 from reciperadar import app
-from reciperadar.models.events.search import SearchEvent
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.utils.decorators import internal
@@ -61,20 +60,19 @@ def recipe_search():
     recrawl_search.delay(include, exclude, equipment, offset)
 
     # Log a search event
-    search_event = SearchEvent(
-        suspected_bot=suspected_bot,
-        include=include,
-        exclude=exclude,
-        equipment=equipment,
-        offset=offset,
-        limit=limit,
-        sort=sort,
-        results_ids=[result['id'] for result in results['results']],
-        results_total=results['total']
-    )
     store_event.delay(
-        event_table=search_event.__tablename__,
-        event_data=search_event.to_doc()
+        event_table='searches',
+        event_data={
+            'suspected_bot': suspected_bot,
+            'include': include,
+            'exclude': exclude,
+            'equipment': equipment,
+            'offset': offset,
+            'limit': limit,
+            'sort': sort,
+            'results_ids': [result['id'] for result in results['results']],
+            'results_total': results['total']
+        }
     )
 
     return jsonify(results)
