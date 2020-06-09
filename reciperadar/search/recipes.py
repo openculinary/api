@@ -7,6 +7,17 @@ class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_include_clause(include):
         return [{
+            'constant_score': {
+                'boost': pow(10, idx),
+                'filter': {
+                    'match': {'contents': inc}
+                }
+            }
+        } for idx, inc in enumerate(reversed(include))]
+
+    @staticmethod
+    def _generate_include_exact_clause(include):
+        return [{
             'nested': {
                 'path': 'ingredients',
                 'query': {
@@ -83,13 +94,14 @@ class RecipeSearch(QueryRepository):
         return self.sort_methods()[sort]
 
     def _render_query(self, include, exclude, equipment, sort,
-                      min_include_match=None):
+                      exact_match=True, min_include_match=None):
+        include_exact_clause = self._generate_include_exact_clause(include)
         include_clause = self._generate_include_clause(include)
         exclude_clause = self._generate_exclude_clause(exclude)
         equipment_clause = self._generate_equipment_clause(equipment)
         sort_params = self._generate_sort_method(include, sort)
 
-        should = include_clause
+        should = include_exact_clause if exact_match else include_clause
         must_not = exclude_clause + [
             {'match': {'hidden': True}},
         ]
@@ -126,24 +138,28 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, 'empty_query'
             return
 
-        query, sort_method = self._render_query(
-            include=include,
-            exclude=exclude,
-            equipment=equipment,
-            sort=sort
-        )
-        yield query, sort_method, None
+        for exact_match in [True, False]:
+            query, sort_method = self._render_query(
+                include=include,
+                exclude=exclude,
+                equipment=equipment,
+                exact_match=exact_match,
+                sort=sort
+            )
+            yield query, sort_method, None
 
         if include:
             for min_include_match in range(len(include), 1, -1):
-                query, sort_method = self._render_query(
-                    include=include,
-                    exclude=exclude,
-                    equipment=equipment,
-                    sort=sort,
-                    min_include_match=min_include_match
-                )
-                yield query, sort_method, 'partial'
+                for exact_match in [True, False]:
+                    query, sort_method = self._render_query(
+                        include=include,
+                        exclude=exclude,
+                        equipment=equipment,
+                        sort=sort,
+                        exact_match=exact_match,
+                        min_include_match=min_include_match
+                    )
+                    yield query, sort_method, 'partial'
 
             query, sort_method = self._render_query(
                 include=include,
