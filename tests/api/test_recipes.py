@@ -17,8 +17,10 @@ def test_search_invalid_sort(query, client):
 @patch('reciperadar.api.recipes.recrawl_search.delay')
 @patch('reciperadar.api.recipes.store_event')
 @patch('reciperadar.search.base.QueryRepository.es.search')
-def test_search_empty_query(search, store, recrawl, client):
-    search.return_value = {'hits': {'hits': [], 'total': {'value': 0}}}
+def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
+    hits = [raw_recipe_hit]
+    total = len(hits)
+    search.return_value = {'hits': {'hits': hits, 'total': {'value': total}}}
 
     response = client.get('/api/recipes/search')
 
