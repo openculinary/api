@@ -319,5 +319,5 @@ class RecipeSearch(QueryRepository):
             'authority': 'api',
             'total': min(results['hits']['total']['value'], 25 * limit),
             'results': recipes,
-            'refinements': [refinement] if refinement else []
+            'refinements': [refinement] if recipes and refinement else []
         }
