@@ -73,6 +73,7 @@ class RecipeIngredient(Storable, Searchable):
                     'match': {
                       'ingredients.product.product_autocomplete': {
                         'query': prefix,
+                        'operator': 'AND',
                         'fuzziness': 'AUTO'
                       }
                     }
