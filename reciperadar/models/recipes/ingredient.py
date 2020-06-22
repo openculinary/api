@@ -71,7 +71,7 @@ class RecipeIngredient(Storable, Searchable):
                 'products': {
                   'filter': {
                     'fuzzy': {
-                      'ingredients.product.product.autocomplete': {
+                      'ingredients.product.product_autocomplete': {
                         'value': prefix
                       }
                     }
