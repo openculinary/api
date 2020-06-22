@@ -72,7 +72,15 @@ class RecipeIngredient(Storable, Searchable):
                   'filter': {
                     'bool': {
                       'should': [
-                        {'match': {'ingredients.product.product': prefix}},
+                        {
+                          'match': {
+                            'ingredients.product.product.autocomplete': {
+                              'query': prefix,
+                              'operator': 'AND',
+                              'fuzziness': 'AUTO'
+                            }
+                          }
+                        },
                         {'prefix': {'ingredients.product.product': prefix}}
                       ]
                     }
