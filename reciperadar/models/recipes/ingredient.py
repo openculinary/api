@@ -74,7 +74,7 @@ class RecipeIngredient(Storable, Searchable):
                       'should': [
                         {
                           'match': {
-                            'ingredients.product.product_autocomplete': {
+                            'ingredients.product.product.autocomplete': {
                               'query': prefix,
                               'operator': 'AND',
                               'fuzziness': 'AUTO'
