@@ -70,9 +70,10 @@ class RecipeIngredient(Storable, Searchable):
                 # filter to product names which match the user search
                 'products': {
                   'filter': {
-                    'fuzzy': {
+                    'match': {
                       'ingredients.product.product_autocomplete': {
-                        'value': prefix
+                        'query': prefix,
+                        'fuzziness': 'AUTO'
                       }
                     }
                   },
