@@ -70,11 +70,10 @@ class RecipeIngredient(Storable, Searchable):
                 # filter to product names which match the user search
                 'products': {
                   'filter': {
-                    'bool': {
-                      'should': [
-                        {'match': {'ingredients.product.product': prefix}},
-                        {'prefix': {'ingredients.product.product': prefix}}
-                      ]
+                    'fuzzy': {
+                      'ingredients.product.product.autocomplete': {
+                        'value': prefix
+                      }
                     }
                   },
                   'aggregations': {
