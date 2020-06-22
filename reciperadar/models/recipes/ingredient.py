@@ -70,12 +70,19 @@ class RecipeIngredient(Storable, Searchable):
                 # filter to product names which match the user search
                 'products': {
                   'filter': {
-                    'match': {
-                      'ingredients.product.product_autocomplete': {
-                        'query': prefix,
-                        'operator': 'AND',
-                        'fuzziness': 'AUTO'
-                      }
+                    'bool': {
+                      'should': [
+                        {
+                          'match': {
+                            'ingredients.product.product_autocomplete': {
+                              'query': prefix,
+                              'operator': 'AND',
+                              'fuzziness': 'AUTO'
+                            }
+                          }
+                        },
+                        {'prefix': {'ingredients.product.product': prefix}}
+                      ]
                     }
                   },
                   'aggregations': {
