@@ -29,6 +29,7 @@ db = SQLAlchemy(app)
 
 
 import reciperadar.api.feedback
+import reciperadar.api.equipment
+import reciperadar.api.ingredients
 import reciperadar.api.recipes
 import reciperadar.api.redirect
-import reciperadar.api.search
