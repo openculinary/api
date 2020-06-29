@@ -93,7 +93,6 @@ class Recipe(Storable, Searchable):
             'rating': self.rating,
             'dst': self.dst,
             'domain': self.domain,
-            'url': self.url,
             'image_url': self.image_path,
         }
 
