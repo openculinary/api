@@ -109,7 +109,8 @@ class RecipeSearch(QueryRepository):
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
         ]
-        min_include_match = min_include_match or len(should)
+        if min_include_match is None:
+            min_include_match = len(should)
 
         return {
             'function_score': {
@@ -166,6 +167,7 @@ class RecipeSearch(QueryRepository):
                 exclude=exclude,
                 equipment=equipment,
                 sort=sort,
+                exact_match=False,
                 min_include_match=0
             )
             yield query, sort_method, 'match_any'
@@ -307,7 +309,7 @@ class RecipeSearch(QueryRepository):
                     'sort': sort_method,
                 }
             )
-            if results['hits']['total']['value']:
+            if results['hits']['total']['value'] >= 5:
                 break
 
         recipes = []
