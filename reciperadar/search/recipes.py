@@ -308,7 +308,7 @@ class RecipeSearch(QueryRepository):
                     'sort': sort_method,
                 }
             )
-            if results['hits']['total']['value']:
+            if results['hits']['total']['value'] >= 5:
                 break
 
         recipes = []
