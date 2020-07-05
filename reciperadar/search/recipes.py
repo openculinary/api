@@ -109,7 +109,8 @@ class RecipeSearch(QueryRepository):
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
         ]
-        min_include_match = min_include_match or len(should)
+        if min_include_match is None:
+            min_include_match = len(should)
 
         return {
             'function_score': {
