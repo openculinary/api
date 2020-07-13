@@ -168,7 +168,7 @@ class RecipeSearch(QueryRepository):
                 equipment=equipment,
                 sort=sort,
                 exact_match=False,
-                min_include_match=0
+                min_include_match=1 if include else 0
             )
             yield query, sort_method, 'match_any'
 
