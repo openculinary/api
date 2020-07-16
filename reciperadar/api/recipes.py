@@ -8,7 +8,7 @@ from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
 
 
-@app.route('/api/recipes/<recipe_id>/view')
+@app.route('/recipes/<recipe_id>/view')
 def recipe_view(recipe_id):
     recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
@@ -21,7 +21,7 @@ def recipe_view(recipe_id):
     return jsonify(results)
 
 
-@app.route('/api/recipes/search')
+@app.route('/recipes/search')
 def recipe_search():
     include = request.args.getlist('include[]')
     exclude = request.args.getlist('exclude[]')

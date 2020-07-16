@@ -6,7 +6,7 @@ from reciperadar.search.recipes import RecipeSearch
 @patch.object(RecipeSearch, 'query')
 def test_search_invalid_sort(query, client):
     response = client.get(
-        path='/api/recipes/search',
+        path='/recipes/search',
         query_string={'sort': 'invalid'}
     )
 
@@ -22,7 +22,7 @@ def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
     total = len(hits)
     search.return_value = {'hits': {'hits': hits, 'total': {'value': total}}}
 
-    response = client.get('/api/recipes/search')
+    response = client.get('/recipes/search')
 
     assert response.status_code == 200
     assert 'refinements' in response.json
@@ -37,7 +37,7 @@ def test_search_user_agent_optional(query, store, recrawl, get, client):
     query.return_value = {'results': [], 'total': 0}
     get.return_value = None
 
-    response = client.get('/api/recipes/search', headers={'user-agent': None})
+    response = client.get('/recipes/search', headers={'user-agent': None})
 
     assert response.status_code == 200
 
@@ -48,7 +48,7 @@ def test_search_user_agent_optional(query, store, recrawl, get, client):
 def test_search_recrawling(query, store, recrawl, client):
     query.return_value = {'results': [], 'total': 0}
 
-    response = client.get('/api/recipes/search', headers={'user-agent': None})
+    response = client.get('/recipes/search', headers={'user-agent': None})
 
     assert response.status_code == 200
     assert recrawl.called is True
@@ -64,7 +64,7 @@ def test_bot_search(query, store, recrawl, client):
         'Mozilla/5.0+',
         '(compatible; UptimeRobot/2.0; http://www.uptimerobot.com/)'
     )
-    client.get('/api/recipes/search', headers={'user-agent': user_agent})
+    client.get('/recipes/search', headers={'user-agent': user_agent})
 
     assert store.called
     assert store.call_args[1]['event_data']['suspected_bot'] is True
