@@ -7,7 +7,7 @@ from reciperadar import app
 from reciperadar.models.feedback import Feedback
 
 
-@app.route('/api/feedback', methods=['POST'])
+@app.route('/feedback', methods=['POST'])
 def feedback():
     issue, image_data_uri = request.json
     image = urlopen(image_data_uri)
