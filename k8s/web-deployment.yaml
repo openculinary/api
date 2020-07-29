@@ -20,7 +20,7 @@ spec:
         imagePullPolicy: IfNotPresent
         name: api
         ports:
-        - containerPort: 80
+        - containerPort: 8000
         env:
           - name: MAIL_USERNAME
             valueFrom:
