@@ -37,6 +37,13 @@ def raw_recipe_hit():
                         "product": "one",
                         "contents": ["content-of-one"],
                         "ancestors": ["ancestor-of-one"]
+                    },
+                    "nutrition": {
+                        "carbohydrates": 0,
+                        "energy": 0,
+                        "fat": 0.01,
+                        "fibre": 0.65,
+                        "protein": 0.05
                     }
                 },
                 {
@@ -51,7 +58,14 @@ def raw_recipe_hit():
             "dst": "https://www.example.com/recipes/test",
             "domain": "example.com",
             "servings": 2,
-            "rating": 4.5
+            "rating": 4.5,
+            "nutrition": {
+                "carbohydrates": 0,
+                "energy": 0,
+                "fat": 0.01,
+                "fibre": 0.65,
+                "protein": 0.05
+            }
         },
         "inner_hits": {"ingredients": {"hits": {"hits": []}}}
     }

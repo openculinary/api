@@ -2,6 +2,7 @@ from reciperadar import db
 from reciperadar.models.base import Searchable, Storable
 from reciperadar.models.recipes.direction import RecipeDirection
 from reciperadar.models.recipes.ingredient import RecipeIngredient
+from reciperadar.models.recipes.nutrition import IngredientNutrition
 
 
 class Recipe(Storable, Searchable):
@@ -16,6 +17,7 @@ class Recipe(Storable, Searchable):
     time = db.Column(db.Integer)
     servings = db.Column(db.Integer)
     rating = db.Column(db.Float)
+    nutrition = db.Column(db.JSON)
     ingredients = db.relationship(
         'RecipeIngredient',
         backref='recipe',
@@ -73,7 +75,9 @@ class Recipe(Storable, Searchable):
             ],
             servings=doc['servings'],
             time=doc['time'],
-            rating=doc['rating']
+            rating=doc['rating'],
+            nutrition=IngredientNutrition.from_doc(doc['nutrition'])
+            if 'nutrition' in doc else None
         )
 
     def to_dict(self, include=None):
@@ -94,6 +98,7 @@ class Recipe(Storable, Searchable):
             'dst': self.dst,
             'domain': self.domain,
             'image_url': self.image_path,
+            'nutrition': self.nutrition.to_dict() if self.nutrition else None,
         }
 
     @property
