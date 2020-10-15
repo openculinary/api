@@ -31,7 +31,7 @@ class RecipeIngredient(Storable, Searchable):
         ingredient_id = doc.get('id') or RecipeIngredient.generate_id()
         return RecipeIngredient(
             id=ingredient_id,
-            index=doc.get('index'),  # TODO
+            index=doc['index'],
             description=doc['description'].strip(),
             markup=doc.get('markup'),
             product=IngredientProduct.from_doc(doc['product']),
