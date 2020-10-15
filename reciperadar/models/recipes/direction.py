@@ -79,20 +79,6 @@ class RecipeDirection(Storable):
             **equipment
         )
 
-    def to_doc(self):
-        data = super().to_doc()
-        data['equipment'] = [
-            {'equipment': appliance.appliance}
-            for appliance in self.appliances
-        ] + [
-            {'equipment': utensil.utensil}
-            for utensil in self.utensils
-        ] + [
-            {'equipment': vessel.vessel}
-            for vessel in self.vessels
-        ]
-        return data
-
     def to_dict(self):
         return {
             'markup': self.markup,

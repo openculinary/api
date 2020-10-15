@@ -111,18 +111,3 @@ class Recipe(Storable, Searchable):
         for product in self.products:
             contents |= set(product.contents or [])
         return list(contents)
-
-    def to_doc(self):
-        data = super().to_doc()
-        data['directions'] = [
-            direction.to_doc()
-            for direction in self.directions
-        ]
-        data['ingredients'] = [
-            ingredient.to_doc()
-            for ingredient in self.ingredients
-        ]
-        data['contents'] = self.contents
-        data['product_count'] = len(self.products)
-        data['hidden'] = self.hidden
-        return data

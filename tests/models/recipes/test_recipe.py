@@ -20,12 +20,3 @@ def test_recipe_from_doc(raw_recipe_hit):
 
     assert recipe.ingredients[0].is_vegan
     assert not recipe.ingredients[0].is_gluten_free
-
-
-def test_hidden_recipe(raw_recipe_hit):
-    recipe = Recipe().from_doc(raw_recipe_hit['_source'])
-    recipe.ingredients[0].product.singular = None
-
-    doc = recipe.to_doc()
-
-    assert doc.get('hidden') is True
