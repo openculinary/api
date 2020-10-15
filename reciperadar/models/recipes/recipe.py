@@ -120,5 +120,4 @@ class Recipe(Storable, Searchable):
         data['contents'] = self.contents
         data['product_count'] = len(self.products)
         data['hidden'] = self.hidden
-        data['src'] = self.dst  # TODO: Backwards compatibility; remove
         return data
