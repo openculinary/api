@@ -18,6 +18,9 @@ def test_recipe_from_doc(raw_recipe_hit):
 
     assert 'nutrition' not in recipe.ingredients[0].to_dict()
 
+    assert recipe.ingredients[0].is_vegan
+    assert not recipe.ingredients[0].is_gluten_free
+
 
 def test_hidden_recipe(raw_recipe_hit):
     recipe = Recipe().from_doc(raw_recipe_hit['_source'])
