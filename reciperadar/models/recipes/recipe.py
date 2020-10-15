@@ -77,7 +77,7 @@ class Recipe(Storable, Searchable):
             time=doc['time'],
             rating=doc['rating'],
             nutrition=IngredientNutrition.from_doc(doc['nutrition'])
-            if 'nutrition' in doc else None
+            if doc.get('nutrition') else None
         )
 
     def to_dict(self, include=None):
