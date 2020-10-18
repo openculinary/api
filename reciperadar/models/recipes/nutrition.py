@@ -29,9 +29,24 @@ class IngredientNutrition(Storable):
 
     def to_dict(self):
         return {
-            'carbohydrates': self.carbohydrates,
-            'energy': self.energy,
-            'fat': self.fat,
-            'fibre': self.fibre,
-            'protein': self.protein,
+            'carbohydrates': {
+                'magnitude': self.carbohydrates,
+                'units': 'g',
+            },
+            'energy': {
+                'magnitude': self.energy,
+                'units': 'cal',
+            },
+            'fat': {
+                'magnitude': self.fat,
+                'units': 'g',
+            },
+            'fibre': {
+                'magnitude': self.fibre,
+                'units': 'g',
+            },
+            'protein': {
+                'magnitude': self.protein,
+                'units': 'g',
+            },
         }
