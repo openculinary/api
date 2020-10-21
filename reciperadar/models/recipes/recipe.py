@@ -13,6 +13,8 @@ class Recipe(Storable, Searchable):
     src = db.Column(db.String)
     dst = db.Column(db.String)
     domain = db.Column(db.String)
+    author = db.Column(db.String)
+    author_url = db.Column(db.String)
     image_src = db.Column(db.String)
     time = db.Column(db.Integer)
     servings = db.Column(db.Integer)
@@ -62,6 +64,8 @@ class Recipe(Storable, Searchable):
             src=doc['src'],
             dst=doc['dst'],
             domain=doc['domain'],
+            author=doc.get('author'),
+            author_url=doc.get('author_url'),
             image_src=doc.get('image_src'),
             ingredients=[
                 RecipeIngredient.from_doc(ingredient)
@@ -97,6 +101,8 @@ class Recipe(Storable, Searchable):
             'rating': self.rating,
             'dst': self.dst,
             'domain': self.domain,
+            'author': self.author,
+            'author_url': self.author_url,
             'image_url': self.image_path,
             'nutrition': self.nutrition.to_dict() if self.nutrition else None,
         }
