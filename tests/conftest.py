@@ -68,7 +68,8 @@ def raw_recipe_hit():
                 "fat": 0.01,
                 "fibre": 0.65,
                 "protein": 0.05
-            }
+            },
+            "is_vegetarian": True
         },
         "inner_hits": {"ingredients": {"hits": {"hits": []}}}
     }
