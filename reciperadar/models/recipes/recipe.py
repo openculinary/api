@@ -113,6 +113,10 @@ class Recipe(Storable, Searchable):
             'author_url': self.author_url,
             'image_url': self.image_path,
             'nutrition': self.nutrition.to_dict() if self.nutrition else None,
+            'is_dairy_free': self.is_dairy_free,
+            'is_gluten_free': self.is_gluten_free,
+            'is_vegan': self.is_vegan,
+            'is_vegetarian': self.is_vegetarian,
         }
 
     @property

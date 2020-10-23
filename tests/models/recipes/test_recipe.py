@@ -19,3 +19,4 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert recipe.nutrition.fibre == 0.65
 
     assert 'nutrition' not in recipe.ingredients[0].to_dict()
+    assert 'is_vegetarian' in recipe.to_dict()
