@@ -36,7 +36,8 @@ def raw_recipe_hit():
                     "product": {
                         "product": "one",
                         "contents": ["content-of-one"],
-                        "ancestors": ["ancestor-of-one"]
+                        "ancestors": ["ancestor-of-one"],
+                        "is_vegan": True,
                     },
                     "nutrition": {
                         "carbohydrates": 0,
@@ -44,14 +45,15 @@ def raw_recipe_hit():
                         "fat": 0.01,
                         "fibre": 0.65,
                         "protein": 0.05
-                    },
-                    "is_vegan": True,
+                    }
                 },
                 {
                     "index": 1,
                     "description": "two units of test ingredient two",
-                    "product": {"product": "two"},
-                    "is_gluten_free": False,
+                    "product": {
+                        "product": "two",
+                        "is_gluten_free": False
+                    }
                 }
             ],
             "author": "example",
