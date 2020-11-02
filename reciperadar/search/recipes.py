@@ -309,7 +309,7 @@ class RecipeSearch(QueryRepository):
 
         aggregations = {
             'domains': {
-                'terms': {'field': 'domain'},
+                'terms': {'field': 'domain', 'size': 100},
             }
         }
 
