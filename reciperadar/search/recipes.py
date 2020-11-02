@@ -112,6 +112,12 @@ class RecipeSearch(QueryRepository):
         if min_include_match is None:
             min_include_match = len(should)
 
+        aggregations = {
+            'domains': {
+                'terms': {'field': 'domain'},
+            }
+        }
+
         return {
             'function_score': {
                 'boost_mode': 'replace',
@@ -123,6 +129,7 @@ class RecipeSearch(QueryRepository):
                         'minimum_should_match': min_include_match,
                     }
                 },
+                'aggs': aggregations,
                 'script_score': {'script': {'source': sort_params['script']}}
             }
         }, [{'_score': sort_params['order']}]
