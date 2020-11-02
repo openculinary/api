@@ -21,6 +21,16 @@ def recipe_view(recipe_id):
     return jsonify(results)
 
 
+def partition_query_terms(terms):
+    partitions = {'include': [], 'exclude': []}
+    for term in terms:
+        term_length = len(term)
+        term = term.lstrip('-')
+        partition = 'include' if len(term) == term_length else 'exclude'
+        partitions[partition].append(term)
+    return partitions
+
+
 @app.route('/recipes/search')
 def recipe_search():
     include = request.args.getlist('include[]')
@@ -34,10 +44,7 @@ def recipe_search():
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
 
-    domains = {
-        'exclude': list(filter(lambda x: x.startswith('-'), domains)),
-        'include': list(filter(lambda x: not x.startswith('-'), domains)),
-    }
+    domains = partition_query_terms(domains)
 
     results = RecipeSearch().query(
         include=include,
