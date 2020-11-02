@@ -328,7 +328,7 @@ class RecipeSearch(QueryRepository):
         for field, aggregation in results['aggregations'].items():
             buckets = aggregation['buckets']
             facets[field] = {
-                bucket['key']: bucket['doc_count']
+                bucket['key']: min(bucket['doc_count'], 100)
                 for bucket in buckets
             }
 
