@@ -324,9 +324,18 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
+        facets = {}
+        for field, aggregation in results['aggregations'].items():
+            buckets = aggregation['buckets']
+            facets[field] = {
+                bucket['key']: bucket['doc_count']
+                for bucket in buckets
+            }
+
         return {
             'authority': 'api',
             'total': min(results['hits']['total']['value'], 25 * limit),
             'results': recipes,
+            'facets': facets,
             'refinements': [refinement] if recipes and refinement else []
         }
