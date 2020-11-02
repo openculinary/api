@@ -94,13 +94,17 @@ class RecipeSearch(QueryRepository):
         return self.sort_methods()[sort]
 
     def _generate_post_filter(self, domains):
-        include_domains = [{'match': domain} for domain in domains['include']]
-        exclude_domains = [{'match': domain} for domain in domains['exclude']]
         conditions = {}
-        if include_domains:
-            conditions['must'] = include_domains
-        if exclude_domains:
-            conditions['must_not'] = exclude_domains
+        if domains['include']:
+            conditions['must'] = [
+                {'match': {'domain': domain}}
+                for domain in domains['include']
+            ]
+        if domains['exclude']:
+            conditions['must_not'] = [
+                {'match': {'domain': domain}}
+                for domain in domains['exclude']
+            ]
         return {'bool': conditions}
 
     def _render_query(self, include, exclude, equipment, sort,
