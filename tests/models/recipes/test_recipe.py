@@ -4,6 +4,7 @@ from reciperadar.models.recipes import Recipe
 def test_recipe_from_doc(raw_recipe_hit):
     recipe = Recipe().from_doc(raw_recipe_hit['_source'])
     assert recipe.author == 'example'
+    assert recipe.is_vegetarian
 
     assert recipe.directions[0].appliances[0].appliance == 'oven'
     assert recipe.directions[0].utensils[0].utensil == 'skewer'
@@ -18,3 +19,4 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert recipe.nutrition.fibre == 0.65
 
     assert 'nutrition' not in recipe.ingredients[0].to_dict()
+    assert 'is_vegetarian' in recipe.to_dict()

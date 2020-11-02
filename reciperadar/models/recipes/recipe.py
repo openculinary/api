@@ -30,6 +30,10 @@ class Recipe(Storable, Searchable):
         backref='recipe',
         passive_deletes='all'
     )
+    is_dairy_free = db.Column(db.Boolean)
+    is_gluten_free = db.Column(db.Boolean)
+    is_vegan = db.Column(db.Boolean)
+    is_vegetarian = db.Column(db.Boolean)
 
     indexed_at = db.Column(db.DateTime)
 
@@ -77,6 +81,10 @@ class Recipe(Storable, Searchable):
                 for direction in doc.get('directions') or []
                 if direction['description'].strip()
             ],
+            is_dairy_free=doc.get('is_dairy_free'),
+            is_gluten_free=doc.get('is_gluten_free'),
+            is_vegan=doc.get('is_vegan'),
+            is_vegetarian=doc.get('is_vegetarian'),
             servings=doc['servings'],
             time=doc['time'],
             rating=doc['rating'],
@@ -105,6 +113,10 @@ class Recipe(Storable, Searchable):
             'author_url': self.author_url,
             'image_url': self.image_path,
             'nutrition': self.nutrition.to_dict() if self.nutrition else None,
+            'is_dairy_free': self.is_dairy_free,
+            'is_gluten_free': self.is_gluten_free,
+            'is_vegan': self.is_vegan,
+            'is_vegetarian': self.is_vegetarian,
         }
 
     @property
