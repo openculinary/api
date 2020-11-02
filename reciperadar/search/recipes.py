@@ -93,6 +93,18 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
+    def _generate_post_filter(self, domains):
+        include_domains = [{'match': domain} for domain in domains['include']]
+        exclude_domains = [{'match': domain} for domain in domains['exclude']]
+        if not include_domains and not exclude_domains:
+            return {}
+        return {
+            'bool': {
+                'must': include_domains,
+                'must_not': exclude_domains,
+            }
+        }
+
     def _render_query(self, include, exclude, equipment, sort,
                       exact_match=True, min_include_match=None):
         include_exact_clause = self._generate_include_exact_clause(include)
@@ -172,7 +184,7 @@ class RecipeSearch(QueryRepository):
             )
             yield query, sort_method, 'match_any'
 
-    def query(self, include, exclude, equipment, offset, limit, sort):
+    def query(self, include, exclude, equipment, offset, limit, sort, domains):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -299,6 +311,8 @@ class RecipeSearch(QueryRepository):
             }
         }
 
+        post_filter = self._generate_post_filter(domains)
+
         queries = self._refined_queries(
             include=include,
             exclude=exclude,
@@ -314,6 +328,7 @@ class RecipeSearch(QueryRepository):
                     'query': query,
                     'sort': sort_method,
                     'aggs': aggregations,
+                    'post_filter': post_filter,
                 }
             )
             if results['hits']['total']['value'] >= 5:

@@ -29,9 +29,15 @@ def recipe_search():
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
+    domains = request.args.getlist('domains[]')
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
+
+    domains = {
+        'exclude': list(filter(lambda x: x.startswith('-'), domains)),
+        'include': list(filter(lambda x: not x.startswith('-'), domains)),
+    }
 
     results = RecipeSearch().query(
         include=include,
@@ -39,7 +45,8 @@ def recipe_search():
         equipment=equipment,
         offset=offset,
         limit=limit,
-        sort=sort
+        sort=sort,
+        domains=domains
     )
 
     user_agent = request.headers.get('user-agent')
