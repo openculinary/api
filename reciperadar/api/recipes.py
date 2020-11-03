@@ -21,6 +21,16 @@ def recipe_view(recipe_id):
     return jsonify(results)
 
 
+def partition_query_terms(terms):
+    partitions = {'include': [], 'exclude': []}
+    for term in terms:
+        term_length = len(term)
+        term = term.lstrip('-')
+        partition = 'include' if len(term) == term_length else 'exclude'
+        partitions[partition].append(term)
+    return partitions
+
+
 @app.route('/recipes/search')
 def recipe_search():
     include = request.args.getlist('include[]')
@@ -29,9 +39,12 @@ def recipe_search():
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
+    domains = request.args.getlist('domains[]')
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
+
+    domains = partition_query_terms(domains)
 
     results = RecipeSearch().query(
         include=include,
@@ -39,7 +52,8 @@ def recipe_search():
         equipment=equipment,
         offset=offset,
         limit=limit,
-        sort=sort
+        sort=sort,
+        domains=domains
     )
 
     user_agent = request.headers.get('user-agent')

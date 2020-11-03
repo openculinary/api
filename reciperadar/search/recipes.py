@@ -93,6 +93,20 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
+    def _generate_post_filter(self, domains):
+        conditions = {}
+        if domains['include']:
+            conditions['must'] = [
+                {'match': {'domain': domain}}
+                for domain in domains['include']
+            ]
+        if domains['exclude']:
+            conditions['must_not'] = [
+                {'match': {'domain': domain}}
+                for domain in domains['exclude']
+            ]
+        return {'bool': conditions}
+
     def _render_query(self, include, exclude, equipment, sort,
                       exact_match=True, min_include_match=None):
         include_exact_clause = self._generate_include_exact_clause(include)
@@ -172,7 +186,7 @@ class RecipeSearch(QueryRepository):
             )
             yield query, sort_method, 'match_any'
 
-    def query(self, include, exclude, equipment, offset, limit, sort):
+    def query(self, include, exclude, equipment, offset, limit, sort, domains):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -293,6 +307,14 @@ class RecipeSearch(QueryRepository):
         limit = max(1, limit)
         limit = min(25, limit)
 
+        aggregations = {
+            'domains': {
+                'terms': {'field': 'domain', 'size': 100},
+            }
+        }
+
+        post_filter = self._generate_post_filter(domains)
+
         queries = self._refined_queries(
             include=include,
             exclude=exclude,
@@ -307,6 +329,8 @@ class RecipeSearch(QueryRepository):
                     'size': limit,
                     'query': query,
                     'sort': sort_method,
+                    'aggs': aggregations,
+                    'post_filter': post_filter,
                 }
             )
             if results['hits']['total']['value'] >= 5:
@@ -317,9 +341,18 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
+        facets = {}
+        for field, aggregation in results['aggregations'].items():
+            buckets = aggregation['buckets']
+            facets[field] = {
+                bucket['key']: min(bucket['doc_count'], 100)
+                for bucket in buckets
+            }
+
         return {
             'authority': 'api',
             'total': min(results['hits']['total']['value'], 25 * limit),
             'results': recipes,
+            'facets': facets,
             'refinements': [refinement] if recipes and refinement else []
         }

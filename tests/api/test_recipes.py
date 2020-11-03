@@ -1,6 +1,16 @@
 from unittest.mock import patch
 
+from reciperadar.api.recipes import partition_query_terms
 from reciperadar.search.recipes import RecipeSearch
+
+
+def test_query_term_partitioning():
+    terms = ['tomato', '-garlic', 'olives']
+    partitions = partition_query_terms(terms)
+    assert partitions == {
+        'include': ['tomato', 'olives'],
+        'exclude': ['garlic'],
+    }
 
 
 @patch.object(RecipeSearch, 'query')
@@ -20,7 +30,10 @@ def test_search_invalid_sort(query, client):
 def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
     hits = [raw_recipe_hit]
     total = len(hits)
-    search.return_value = {'hits': {'hits': hits, 'total': {'value': total}}}
+    search.return_value = {
+        'hits': {'hits': hits, 'total': {'value': total}},
+        'aggregations': {},
+    }
 
     response = client.get('/recipes/search')
 
