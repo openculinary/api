@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import QueryRepository
 
@@ -94,14 +96,14 @@ class RecipeSearch(QueryRepository):
         return self.sort_methods()[sort]
 
     def _generate_post_filter(self, domains):
-        conditions = {}
+        conditions = defaultdict(list)
         if domains['include']:
-            conditions['must'] = [
+            conditions['must'] += [
                 {'match': {'domain': domain}}
                 for domain in domains['include']
             ]
         if domains['exclude']:
-            conditions['must_not'] = [
+            conditions['must_not'] += [
                 {'match': {'domain': domain}}
                 for domain in domains['exclude']
             ]
