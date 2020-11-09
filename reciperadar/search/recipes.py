@@ -95,7 +95,7 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
-    def _generate_post_filter(self, domains):
+    def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         if domains['include']:
             conditions['must'] += [
@@ -106,6 +106,11 @@ class RecipeSearch(QueryRepository):
             conditions['must_not'] += [
                 {'match': {'domain': domain}}
                 for domain in domains['exclude']
+            ]
+        if dietary_properties:
+            conditions['must'] += [
+                {'match': {f'is_{dietary_property}': True}}
+                for dietary_property in dietary_properties
             ]
         return {'bool': conditions}
 
@@ -188,7 +193,8 @@ class RecipeSearch(QueryRepository):
             )
             yield query, sort_method, 'match_any'
 
-    def query(self, include, exclude, equipment, offset, limit, sort, domains):
+    def query(self, include, exclude, equipment, offset, limit, sort, domains,
+              dietary_properties):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -315,7 +321,7 @@ class RecipeSearch(QueryRepository):
             }
         }
 
-        post_filter = self._generate_post_filter(domains)
+        post_filter = self._generate_post_filter(domains, dietary_properties)
 
         queries = self._refined_queries(
             include=include,
