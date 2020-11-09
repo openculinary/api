@@ -44,8 +44,8 @@ def recipe_search():
     dietary_properties = {
         dietary_property: True
         for dietary_property in [
-            'dairy_free',
-            'gluten_free',
+            'dairy-free',
+            'gluten-free',
             'vegan',
             'vegetarian',
         ]

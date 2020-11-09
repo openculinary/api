@@ -109,7 +109,7 @@ class RecipeSearch(QueryRepository):
             ]
         if dietary_properties:
             conditions['must'] += [
-                {'match': {f'is_{dietary_property}': True}}
+                {'match': {f'is_{dietary_property.replace("-", "_")}': True}}
                 for dietary_property in dietary_properties
             ]
         return {'bool': conditions}
