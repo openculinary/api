@@ -41,6 +41,17 @@ def recipe_search():
     sort = request.args.get('sort', type=str)
     domains = request.args.getlist('domains[]')
 
+    dietary_properties = {
+        dietary_property: True
+        for dietary_property in [
+            'dairy-free',
+            'gluten-free',
+            'vegan',
+            'vegetarian',
+        ]
+        if dietary_property in request.args
+    }
+
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
 
@@ -53,7 +64,8 @@ def recipe_search():
         offset=offset,
         limit=limit,
         sort=sort,
-        domains=domains
+        domains=domains,
+        dietary_properties=dietary_properties,
     )
 
     user_agent = request.headers.get('user-agent')
