@@ -2,7 +2,7 @@ from reciperadar import db
 from reciperadar.models.base import Searchable, Storable
 from reciperadar.models.recipes.direction import RecipeDirection
 from reciperadar.models.recipes.ingredient import RecipeIngredient
-from reciperadar.models.recipes.nutrition import IngredientNutrition
+from reciperadar.models.recipes.nutrition import RecipeNutrition
 
 
 class Recipe(Storable, Searchable):
@@ -26,6 +26,12 @@ class Recipe(Storable, Searchable):
     )
     directions = db.relationship(
         'RecipeDirection',
+        passive_deletes='all'
+    )
+    nutrition = db.relationship(
+        'RecipeNutrition',
+        backref='recipe',
+        uselist=False,
         passive_deletes='all'
     )
     is_dairy_free = db.Column(db.Boolean)
@@ -79,15 +85,15 @@ class Recipe(Storable, Searchable):
                 for direction in doc.get('directions') or []
                 if direction['description'].strip()
             ],
+            nutrition=RecipeNutrition.from_doc(doc['nutrition'])
+            if doc.get('nutrition') else None,
             is_dairy_free=doc.get('is_dairy_free'),
             is_gluten_free=doc.get('is_gluten_free'),
             is_vegan=doc.get('is_vegan'),
             is_vegetarian=doc.get('is_vegetarian'),
             servings=doc['servings'],
             time=doc['time'],
-            rating=doc['rating'],
-            nutrition=IngredientNutrition.from_doc(doc['nutrition'])
-            if doc.get('nutrition') else None
+            rating=doc['rating']
         )
 
     def to_dict(self, ingredients=None):
