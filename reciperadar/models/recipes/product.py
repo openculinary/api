@@ -12,7 +12,6 @@ class IngredientProduct(Storable):
 
     id = db.Column(db.String, primary_key=True)
     product_id = db.Column(db.String)
-    product = db.Column(db.String)
     product_parser = db.Column(db.String)
     is_plural = db.Column(db.Boolean)
     singular = db.Column(db.String)
@@ -29,7 +28,6 @@ class IngredientProduct(Storable):
         return IngredientProduct(
             id=product_id,
             product_id=doc.get('product_id'),
-            product=doc.get('product'),
             product_parser=doc.get('product_parser'),
             is_plural=doc.get('is_plural'),
             singular=doc.get('singular'),
@@ -37,6 +35,10 @@ class IngredientProduct(Storable):
             category=doc.get('category'),
             contents=doc.get('contents'),
         )
+
+    @property
+    def product(self):
+        return self.plural if self.is_plural else self.singular
 
     def state(self, include):
         states = {
