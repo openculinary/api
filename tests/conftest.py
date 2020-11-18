@@ -34,9 +34,6 @@ def raw_recipe_hit():
                     "index": 0,
                     "description": "1 unit of test ingredient one",
                     "product": {
-                        "singular": "one",
-                        "plural": "ones",
-                        "is_plural": False,
                         "contents": [
                             "one",
                             "content-of-one",
