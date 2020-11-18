@@ -341,7 +341,15 @@ class RecipeSearch(QueryRepository):
                     'post_filter': post_filter,
                 }
             )
-            if results['hits']['total']['value'] >= 5:
+
+            # Ignoring the displayed hits, sum the document counts across
+            # one of the facets (summing across all facets would double-count)
+            doc_count = 0
+            for aggregation in results['aggregations'].values():
+                for bucket in aggregation['buckets']:
+                    doc_count += bucket['doc_count']
+                break
+            if doc_count >= 5:
                 break
 
         recipes = []
