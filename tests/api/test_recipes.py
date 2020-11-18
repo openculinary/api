@@ -32,7 +32,12 @@ def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
     total = len(hits)
     search.return_value = {
         'hits': {'hits': hits, 'total': {'value': total}},
-        'aggregations': {},
+        'aggregations': {
+            'prefilter': {
+                'doc_count': 0,
+                'domains': {'buckets': []},
+            }
+        },
     }
 
     response = client.get('/recipes/search')
