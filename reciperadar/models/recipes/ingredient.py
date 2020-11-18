@@ -1,22 +1,25 @@
 from reciperadar import db
 from reciperadar.models.base import Searchable, Storable
-from reciperadar.models.recipes.product import IngredientProduct
 from reciperadar.models.recipes.nutrition import IngredientNutrition
+from reciperadar.models.recipes.product import Product
 
 
 class RecipeIngredient(Storable, Searchable):
     __tablename__ = 'recipe_ingredients'
 
-    fk = db.ForeignKey('recipes.id', ondelete='cascade')
-    recipe_id = db.Column(db.String, fk, index=True)
+    recipe_fk = db.ForeignKey('recipes.id', ondelete='cascade')
+    recipe_id = db.Column(db.String, recipe_fk, index=True)
+
+    product_fk = db.ForeignKey('products.id', deferrable=True)
+    product_id = db.Column(db.String, product_fk, index=True)
 
     id = db.Column(db.String, primary_key=True)
     index = db.Column(db.Integer)
     description = db.Column(db.String)
     markup = db.Column(db.String)
+
     product = db.relationship(
-        'IngredientProduct',
-        backref='recipe_ingredient',
+        'Product',
         uselist=False,
         passive_deletes='all'
     )
@@ -31,6 +34,8 @@ class RecipeIngredient(Storable, Searchable):
     magnitude_parser = db.Column(db.String)
     units = db.Column(db.String)
     units_parser = db.Column(db.String)
+    product_is_plural = db.Column(db.Boolean)
+    product_parser = db.Column(db.String)
     verb = db.Column(db.String)
 
     @staticmethod
@@ -42,7 +47,10 @@ class RecipeIngredient(Storable, Searchable):
             index=doc['index'],
             description=doc['description'].strip(),
             markup=doc.get('markup'),
-            product=IngredientProduct.from_doc(doc['product']),
+            product=Product.from_doc(doc['product']),
+            product_id=doc['product'].get('product_id'),
+            product_is_plural=doc['product'].get('is_plural'),
+            product_parser=doc['product'].get('product_parser'),
             nutrition=IngredientNutrition.from_doc(nutrition)
             if nutrition else None,
             magnitude=doc.get('magnitude'),
@@ -151,8 +159,8 @@ class RecipeIngredient(Storable, Searchable):
             singular = (result['singular']['buckets'] or [{}])[0].get('key')
             plural = (result['plural']['buckets'] or [{}])[0].get('key')
 
-            suggestions.append(IngredientProduct(
-                product_id=product_id,
+            suggestions.append(Product(
+                id=product_id,
                 product=plural if plural_wins else singular,
                 category=category,
                 singular=singular,
@@ -165,7 +173,7 @@ class RecipeIngredient(Storable, Searchable):
             len(s.product)),  # sort remaining matches by length
         )
         return [{
-            'product_id': suggestion.product_id,
+            'product_id': suggestion.id,
             'product': suggestion.product,
             'category': suggestion.category,
             'singular': suggestion.singular,

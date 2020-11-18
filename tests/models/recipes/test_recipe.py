@@ -9,7 +9,7 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert recipe.directions[0].appliances[0].appliance == 'oven'
     assert recipe.directions[0].utensils[0].utensil == 'skewer'
 
-    assert recipe.ingredients[0].product.product == 'one'
+    assert recipe.ingredients[0].product.singular == 'one'
     expected_contents = ['one', 'content-of-one', 'ancestor-of-one']
     actual_contents = recipe.ingredients[0].product.contents
 
