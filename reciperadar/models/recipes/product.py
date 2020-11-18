@@ -26,11 +26,6 @@ class IngredientProduct(Storable):
     @staticmethod
     def from_doc(doc):
         product_id = doc.get('id') or IngredientProduct.generate_id()
-        contents = list(set(
-            [doc.get('product')] +
-            (doc.get('contents') or []) +
-            (doc.get('ancestors') or [])
-        ))
         return IngredientProduct(
             id=product_id,
             product_id=doc.get('product_id'),
@@ -40,7 +35,7 @@ class IngredientProduct(Storable):
             singular=doc.get('singular'),
             plural=doc.get('plural'),
             category=doc.get('category'),
-            contents=contents,
+            contents=doc.get('contents'),
         )
 
     def state(self, include):
