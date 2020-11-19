@@ -159,22 +159,23 @@ class RecipeIngredient(Storable, Searchable):
             singular = (result['singular']['buckets'] or [{}])[0].get('key')
             plural = (result['plural']['buckets'] or [{}])[0].get('key')
 
-            suggestions.append(Product(
+            product = Product(
                 id=product_id,
-                product=plural if plural_wins else singular,
                 category=category,
                 singular=singular,
                 plural=plural,
-            ))
+            )
+            product.name = plural if plural_wins else singular
+            suggestions.append(product)
 
         suggestions.sort(key=lambda s: (
-            s.product != prefix,  # exact matches first
-            not s.product.startswith(prefix),  # prefix matches next
-            len(s.product)),  # sort remaining matches by length
+            s.name != prefix,  # exact matches first
+            not s.name.startswith(prefix),  # prefix matches next
+            len(s.name)),  # sort remaining matches by length
         )
         return [{
             'product_id': suggestion.id,
-            'product': suggestion.product,
+            'product': suggestion.name,
             'category': suggestion.category,
             'singular': suggestion.singular,
             'plural': suggestion.plural,
