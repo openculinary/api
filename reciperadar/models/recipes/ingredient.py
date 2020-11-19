@@ -38,6 +38,13 @@ class RecipeIngredient(Storable, Searchable):
     product_parser = db.Column(db.String)
     verb = db.Column(db.String)
 
+    @property
+    def product_name(self):
+        if self.product_is_plural:
+            return self.product.plural
+        else:
+            return self.product.singular
+
     @staticmethod
     def from_doc(doc):
         ingredient_id = doc.get('id') or RecipeIngredient.generate_id()
@@ -63,7 +70,10 @@ class RecipeIngredient(Storable, Searchable):
     def to_dict(self, include=None):
         return {
             'markup': self.markup,
-            'product': self.product.to_dict(include),
+            'product': {
+                **self.product.to_dict(include),
+                **{'name': self.product_name},
+            },
             'quantity': {
                 'magnitude': self.magnitude,
                 'units': self.units,
@@ -174,8 +184,8 @@ class RecipeIngredient(Storable, Searchable):
             len(s.name)),  # sort remaining matches by length
         )
         return [{
-            'product_id': suggestion.id,
-            'product': suggestion.name,
+            'id': suggestion.id,
+            'name': suggestion.name,
             'category': suggestion.category,
             'singular': suggestion.singular,
             'plural': suggestion.plural,
