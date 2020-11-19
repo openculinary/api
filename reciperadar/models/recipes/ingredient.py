@@ -48,8 +48,8 @@ class RecipeIngredient(Storable, Searchable):
             description=doc['description'].strip(),
             markup=doc.get('markup'),
             product=Product.from_doc(doc['product']),
-            product_id=doc['product'].get('product_id'),
-            product_is_plural=doc['product'].get('is_plural'),
+            product_id=doc['product'].get('id'),
+            product_is_plural=doc.get('product_is_plural'),
             product_parser=doc['product'].get('product_parser'),
             nutrition=IngredientNutrition.from_doc(nutrition)
             if nutrition else None,
@@ -89,14 +89,14 @@ class RecipeIngredient(Storable, Searchable):
                       'should': [
                         {
                           'match': {
-                            'ingredients.product.product.autocomplete': {
+                            'ingredients.product_name.autocomplete': {
                               'query': prefix,
                               'operator': 'AND',
                               'fuzziness': 'AUTO'
                             }
                           }
                         },
-                        {'prefix': {'ingredients.product.product': prefix}}
+                        {'prefix': {'ingredients.product_name': prefix}}
                       ]
                     }
                   },
@@ -104,7 +104,7 @@ class RecipeIngredient(Storable, Searchable):
                     # retrieve the top products in singular pluralization
                     'product_id': {
                       'terms': {
-                        'field': 'ingredients.product.product_id',
+                        'field': 'ingredients.product.id',
                         'min_doc_count': 5,
                         'size': 10
                       },
@@ -112,7 +112,7 @@ class RecipeIngredient(Storable, Searchable):
                         # count products that were plural in the source recipe
                         'plurality': {
                           'filter': {
-                            'match': {'ingredients.product.is_plural': True}
+                            'match': {'ingredients.product_is_plural': True}
                           }
                         },
                         # retrieve a category for each ingredient
