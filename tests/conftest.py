@@ -36,13 +36,14 @@ def raw_recipe_hit():
                     "product": {
                         "singular": "one",
                         "plural": "ones",
-                        "is_plural": False,
                         "contents": [
                             "one",
                             "content-of-one",
                             "ancestor-of-one",
                         ],
                     },
+                    "product_is_plural": False,
+                    "product_name": "one",
                     "nutrition": {
                         "carbohydrates": 0,
                         "energy": 0,
@@ -55,8 +56,10 @@ def raw_recipe_hit():
                     "index": 1,
                     "description": "two units of test ingredient two",
                     "product": {
-                        "product": "two"
-                    }
+                        "singular": "two"
+                    },
+                    "product_is_plural": False,
+                    "product_name": "two"
                 }
             ],
             "author": "example",
