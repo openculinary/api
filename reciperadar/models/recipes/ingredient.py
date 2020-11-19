@@ -74,7 +74,7 @@ class RecipeIngredient(Storable, Searchable):
                 **self.product.to_dict(include),
                 # TODO: would a 'countable' flag on products be preferable?
                 **{'name': self.product_name},
-                # TODO: these fields are provided for backwards-compatbility
+                # TODO: these fields are provided for backwards-compatibility
                 **{
                     'product_id': self.product.id,
                     'product': self.product_name,
@@ -195,7 +195,7 @@ class RecipeIngredient(Storable, Searchable):
             'category': suggestion.category,
             'singular': suggestion.singular,
             'plural': suggestion.plural,
-            # TODO: these fields are provided for backwards-compatbility
+            # TODO: these fields are provided for backwards-compatibility
             'product_id': suggestion.id,
             'product': suggestion.name,
         } for suggestion in suggestions]
