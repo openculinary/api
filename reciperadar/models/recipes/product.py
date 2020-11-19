@@ -41,7 +41,7 @@ class Product(Storable):
 
     def to_dict(self, include):
         return {
-            'product_id': self.id,
+            'id': self.id,
             'category': self.category,
             'singular': self.singular,
             'plural': self.plural,
