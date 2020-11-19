@@ -32,7 +32,12 @@ def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
     total = len(hits)
     search.return_value = {
         'hits': {'hits': hits, 'total': {'value': total}},
-        'aggregations': {},
+        'aggregations': {
+            'prefilter': {
+                'doc_count': 0,
+                'domains': {'buckets': []},
+            }
+        },
     }
 
     response = client.get('/recipes/search')
@@ -40,6 +45,7 @@ def test_search_empty_query(search, store, recrawl, client, raw_recipe_hit):
     assert response.status_code == 200
     assert 'refinements' in response.json
     assert 'empty_query' in response.json['refinements']
+    assert 'domains' in response.json['facets']
 
 
 @patch('werkzeug.datastructures.Headers.get')

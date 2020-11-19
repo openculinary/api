@@ -95,6 +95,14 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
+    def _generate_aggregations(self, facets):
+        return {
+            'prefilter': {
+                'filter': {'match_all': {}},
+                'aggs': facets,
+            }
+        }
+
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         if domains['include']:
@@ -315,12 +323,13 @@ class RecipeSearch(QueryRepository):
         limit = max(1, limit)
         limit = min(25, limit)
 
-        aggregations = {
+        facets = {
             'domains': {
                 'terms': {'field': 'domain', 'size': 100},
             }
         }
 
+        aggregations = self._generate_aggregations(facets)
         post_filter = self._generate_post_filter(domains, dietary_properties)
 
         queries = self._refined_queries(
@@ -342,14 +351,7 @@ class RecipeSearch(QueryRepository):
                 }
             )
 
-            # Ignoring the displayed hits, sum the document counts across
-            # one of the facets (summing across all facets would double-count)
-            doc_count = 0
-            for aggregation in results['aggregations'].values():
-                for bucket in aggregation['buckets']:
-                    doc_count += bucket['doc_count']
-                break
-            if doc_count >= 5:
+            if results['aggregations']['prefilter']['doc_count'] >= 5:
                 break
 
         recipes = []
@@ -357,9 +359,8 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
-        facets = {}
-        for field, aggregation in results['aggregations'].items():
-            buckets = aggregation['buckets']
+        for field in facets:
+            buckets = results['aggregations']['prefilter'][field]['buckets']
             facets[field] = {
                 bucket['key']: min(bucket['doc_count'], 100)
                 for bucket in buckets
