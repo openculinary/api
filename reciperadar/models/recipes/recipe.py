@@ -22,12 +22,10 @@ class Recipe(Storable, Searchable):
     nutrition = db.Column(db.JSON)
     ingredients = db.relationship(
         'RecipeIngredient',
-        backref='recipe',
         passive_deletes='all'
     )
     directions = db.relationship(
         'RecipeDirection',
-        backref='recipe',
         passive_deletes='all'
     )
     is_dairy_free = db.Column(db.Boolean)
