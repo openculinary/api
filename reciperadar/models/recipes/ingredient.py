@@ -195,4 +195,7 @@ class RecipeIngredient(Storable, Searchable):
             'category': suggestion.category,
             'singular': suggestion.singular,
             'plural': suggestion.plural,
+            # TODO: these fields are provided for backwards-compatbility
+            'product_id': suggestion.id,
+            'product': suggestion.name,
         } for suggestion in suggestions]
