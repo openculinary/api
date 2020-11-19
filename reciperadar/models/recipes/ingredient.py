@@ -72,6 +72,7 @@ class RecipeIngredient(Storable, Searchable):
             'markup': self.markup,
             'product': {
                 **self.product.to_dict(include),
+                # TODO: would a 'countable' flag on products be preferable?
                 **{'name': self.product_name},
             },
             'quantity': {
