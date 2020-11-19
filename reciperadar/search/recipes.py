@@ -229,7 +229,7 @@ class RecipeSearch(QueryRepository):
         recipe 1            "3 sweet potatoes"  ->  "sweet potato"
                             "1 onion"           ->  "onion"
                             ...
-        recipe 2            "2k onions"         ->  "onion"
+        recipe 2            "2kg onions"        ->  "onion"
                             ...
 
 
