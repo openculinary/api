@@ -450,7 +450,7 @@ class RecipeSearch(QueryRepository):
 
         choices = prefiltered['ingredients']['choices']['products']['buckets']
         choices.sort(key=lambda choice: abs(choice['doc_count'] - (total / 2)))
-        choices = [choices['key'] for choice in choices]
+        choices = [choice['key'] for choice in choices]
 
         recipes = []
         for result in results['hits']['hits']:
