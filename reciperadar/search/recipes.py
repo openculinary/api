@@ -363,11 +363,13 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
-        for field in facets:
-            buckets = results['aggregations']['prefilter'][field]['buckets']
+        facets = {}
+        for field, content in results['aggregations']['prefilter'].items():
+            if not isinstance(content, dict) or 'buckets' not in content:
+                continue
             facets[field] = {
                 bucket['key']: min(bucket['doc_count'], 100)
-                for bucket in buckets
+                for bucket in content['buckets']
             }
 
         return {
