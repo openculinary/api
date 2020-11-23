@@ -107,9 +107,13 @@ class RecipeSearch(QueryRepository):
             }
         }
 
-    def _product_filter(self, include):
+    def _product_filter(self, include, dietary_properties):
         return {
             'bool': {
+                'must': [
+                    {'term': {f'is_{dietary_property.replace("-","_")}': True}}
+                    for dietary_property in dietary_properties
+                ],
                 'must_not': [
                     # Do not present staple ingredients as choices
                     {'term': {'ingredients.product.is_kitchen_staple': True}}
@@ -132,8 +136,8 @@ class RecipeSearch(QueryRepository):
             }
         }
 
-    def _product_suggestions(self, include):
-        product_filter = self._product_filter(include)
+    def _product_suggestions(self, include, dietary_properties):
+        product_filter = self._product_filter(include, dietary_properties)
         product_aggregation = self._product_aggregatation()
         return {
             'products': {
@@ -147,10 +151,14 @@ class RecipeSearch(QueryRepository):
             }
         }
 
-    def _generate_aggregations(self, include, suggest_products):
+    def _generate_aggregations(self, suggest_products, include,
+                               dietary_properties):
         aggregations = {
             **self._domain_facets(),
-            **(self._product_suggestions(include) if suggest_products else {}),
+            **(
+                self._product_suggestions(include, dietary_properties)
+                if suggest_products else {}
+            )
         }
         return {
             'prefilter': {
@@ -378,8 +386,15 @@ class RecipeSearch(QueryRepository):
         limit = max(0, limit)
         limit = min(25, limit)
 
-        aggregations = self._generate_aggregations(include, suggest_products)
-        post_filter = self._generate_post_filter(domains, dietary_properties)
+        aggregations = self._generate_aggregations(
+            suggest_products=suggest_products,
+            include=include,
+            dietary_properties=dietary_properties
+        )
+        post_filter = self._generate_post_filter(
+            domains=domains,
+            dietary_properties=dietary_properties
+        )
 
         queries = self._refined_queries(
             include=include,
