@@ -1,19 +1,19 @@
 from flask import jsonify, request
 
 from reciperadar import app
-from reciperadar.models.recipes import RecipeEquipment
-from reciperadar.models.recipes import RecipeIngredient
+from reciperadar.search.equipment import EquipmentSearch
+from reciperadar.search.ingredients import IngredientSearch
 
 
 @app.route('/autosuggest/equipment')
 def equipment():
     prefix = request.args.get('pre')
-    results = RecipeEquipment().autosuggest(prefix)
+    results = EquipmentSearch().autosuggest(prefix)
     return jsonify(results)
 
 
 @app.route('/autosuggest/ingredients')
 def ingredients():
     prefix = request.args.get('pre')
-    results = RecipeIngredient().autosuggest(prefix)
+    results = IngredientSearch().autosuggest(prefix)
     return jsonify(results)
