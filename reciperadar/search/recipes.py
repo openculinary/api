@@ -205,7 +205,7 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, 'match_any'
 
     def query(self, include, exclude, equipment, offset, limit, sort, domains,
-              dietary_properties):
+              dietary_properties, allow_refinement=True):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -353,7 +353,8 @@ class RecipeSearch(QueryRepository):
                     'post_filter': post_filter,
                 }
             )
-
+            if not allow_refinement:
+                break
             if results['aggregations']['prefilter']['doc_count'] >= 5:
                 break
 
