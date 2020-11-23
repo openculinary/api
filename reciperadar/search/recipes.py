@@ -100,11 +100,62 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
-    def _generate_aggregations(self, facets):
+    def _domain_facets(self):
+        return {
+            'domains': {
+                'terms': {'field': 'domain', 'size': 100}
+            }
+        }
+
+    def _product_filter(self, include):
+        return {
+            'bool': {
+                'must_not': [
+                    # Do not present staple ingredients as choices
+                    {'term': {'ingredients.product.is_kitchen_staple': True}}
+                ] + [
+                    # Do not present already-selected ingredients as choices
+                    {'term': {'ingredients.product.singular': inc}}
+                    for inc in include
+                ]
+            }
+        }
+
+    def _product_aggregatation(self):
+        return {
+            'products': {
+                'terms': {
+                    'field': 'ingredients.product.singular',
+                    'order': {'_count': 'desc'},
+                    'size': 5
+                }
+            }
+        }
+
+    def _product_suggestions(self, include):
+        product_filter = self._product_filter(include)
+        product_aggregation = self._product_aggregatation()
+        return {
+            'ingredients': {
+                'nested': {'path': 'ingredients'},
+                'aggs': {
+                    'choices': {
+                        'filter': product_filter,
+                        'aggs': product_aggregation,
+                    }
+                }
+            }
+        }
+
+    def _generate_aggregations(self, include, suggest_products):
+        aggregations = {
+            **self._domain_facets(),
+            **(self._product_suggestions(include) if suggest_products else {}),
+        }
         return {
             'prefilter': {
                 'filter': {'match_all': {}},
-                'aggs': facets,
+                'aggs': aggregations,
             }
         }
 
@@ -205,7 +256,8 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, 'match_any'
 
     def query(self, include, exclude, equipment, offset, limit, sort, domains,
-              dietary_properties, allow_refinement=True):
+              dietary_properties, allow_refinement=True,
+              suggest_products=False):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -326,13 +378,7 @@ class RecipeSearch(QueryRepository):
         limit = max(1, limit)
         limit = min(25, limit)
 
-        facets = {
-            'domains': {
-                'terms': {'field': 'domain', 'size': 100},
-            }
-        }
-
-        aggregations = self._generate_aggregations(facets)
+        aggregations = self._generate_aggregations(include, suggest_products)
         post_filter = self._generate_post_filter(domains, dietary_properties)
 
         queries = self._refined_queries(
@@ -363,6 +409,16 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
+        # TODO: Can this bucket sorting be moved into the aggregation pipeline?
+        if suggest_products:
+            prefilter = results['aggregations']['prefilter']
+            total = prefilter['doc_count']
+
+            ingredients = prefilter.pop('ingredients')
+            ingredients = ingredients['choices']['products']['buckets']
+            ingredients.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
+            prefilter['ingredients'] = ingredients
+
         facets = {}
         for field, content in results['aggregations']['prefilter'].items():
             if not isinstance(content, dict) or 'buckets' not in content:
@@ -380,92 +436,18 @@ class RecipeSearch(QueryRepository):
             'refinements': [refinement] if recipes and refinement else []
         }
 
-    def _render_explore_query(self, include, exclude, dietary_properties):
-        query = self._generate_post_filter({}, dietary_properties)
-        query['bool']['must'] += self._generate_include_exact_clause(include)
-        query['bool']['must_not'] += self._generate_exclude_clause(exclude)
-        sort_method = [{'rating': 'desc'}]
-        return query, sort_method
-
-    def _product_filter(self, include):
-        return {
-            'bool': {
-                'must_not': [
-                    # Do not present staple ingredients as choices
-                    {'term': {'ingredients.product.is_kitchen_staple': True}}
-                ] + [
-                    # Do not present already-selected ingredients as choices
-                    {'term': {'ingredients.product.singular': inc}}
-                    for inc in include
-                ]
-            }
-        }
-
-    def _product_aggregatation(self):
-        return {
-            'products': {
-                'terms': {
-                    'field': 'ingredients.product.singular',
-                    'order': {'_count': 'desc'},
-                    'size': 5
-                }
-            }
-        }
-
-    def _render_explore_aggregations(self, include):
-        product_filter = self._product_filter(include)
-        product_aggregation = self._product_aggregatation()
-        return {
-            'prefilter': {
-                'filter': {'match_all': {}},
-                'aggs': {
-                    'ingredients': {
-                        'nested': {'path': 'ingredients'},
-                        'aggs': {
-                            'choices': {
-                                'filter': product_filter,
-                                'aggs': product_aggregation,
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
     def explore(self, include, exclude, dietary_properties):
         depth = len(include) + len(exclude)
         limit = 10 if depth >= 3 else 0
-        query, sort_method = self._render_explore_query(
+        return self.query(
             include=include,
             exclude=exclude,
-            dietary_properties=dietary_properties
+            equipment=[],
+            offset=0,
+            limit=limit,
+            sort=None,
+            domains={},
+            dietary_properties=dietary_properties,
+            allow_refinement=False,
+            suggest_products=True
         )
-        aggregations = self._render_explore_aggregations(include)
-        results = self.es.search(
-            index='recipes',
-            body={
-                'query': query,
-                'size': limit,
-                'sort': sort_method,
-                'aggs': aggregations,
-            }
-        )
-
-        prefiltered = results['aggregations']['prefilter']
-        total = prefiltered['doc_count']
-
-        choices = prefiltered['ingredients']['choices']['products']['buckets']
-        choices.sort(key=lambda choice: abs(choice['doc_count'] - (total / 2)))
-        choices = [choice['key'] for choice in choices]
-
-        recipes = []
-        for result in results['hits']['hits']:
-            recipe = Recipe.from_doc(result['_source'])
-            recipes.append(recipe.to_dict(include))
-
-        return {
-            'authority': 'api',
-            'choices': choices,
-            'total': min(results['hits']['total']['value'], 25 * limit),
-            'results': recipes,
-        }
