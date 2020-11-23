@@ -111,7 +111,7 @@ class RecipeSearch(QueryRepository):
         return {
             'bool': {
                 'must': [
-                    {'term': {f'is_{dietary_property.replace("-","_")}': True}}
+                    {'term': {f'ingredients.product.is_{dietary_property.replace("-", "_")}': True}}
                     for dietary_property in dietary_properties
                 ],
                 'must_not': [
