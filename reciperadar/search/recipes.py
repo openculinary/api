@@ -111,8 +111,11 @@ class RecipeSearch(QueryRepository):
         return {
             'bool': {
                 'must': [
-                    {'term': {f'ingredients.product.is_{dietary_property.replace("-", "_")}': True}}
-                    for dietary_property in dietary_properties
+                    {'term': {f'ingredients.product.{dietary_property}': True}}
+                    for dietary_property in [
+                        f'is_{dietary_property.replace("-", "_")}'
+                        for dietary_property in dietary_properties
+                    ]
                 ],
                 'must_not': [
                     # Do not present staple ingredients as choices
