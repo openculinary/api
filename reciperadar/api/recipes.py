@@ -31,6 +31,19 @@ def partition_query_terms(terms):
     return partitions
 
 
+def extract_dietary_properties(args):
+    return {
+        dietary_property: True
+        for dietary_property in [
+            'dairy-free',
+            'gluten-free',
+            'vegan',
+            'vegetarian',
+        ]
+        if dietary_property in args
+    }
+
+
 @app.route('/recipes/search')
 def recipe_search():
     include = request.args.getlist('include[]')
@@ -40,17 +53,7 @@ def recipe_search():
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
     domains = request.args.getlist('domains[]')
-
-    dietary_properties = {
-        dietary_property: True
-        for dietary_property in [
-            'dairy-free',
-            'gluten-free',
-            'vegan',
-            'vegetarian',
-        ]
-        if dietary_property in request.args
-    }
+    dietary_properties = extract_dietary_properties(request.args)
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
