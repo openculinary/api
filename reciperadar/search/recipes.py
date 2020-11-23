@@ -375,7 +375,7 @@ class RecipeSearch(QueryRepository):
           appears multiple times in a recipe, resulting in duplicate counts
         """
         offset = max(0, offset)
-        limit = max(1, limit)
+        limit = max(0, limit)
         limit = min(25, limit)
 
         aggregations = self._generate_aggregations(include, suggest_products)
