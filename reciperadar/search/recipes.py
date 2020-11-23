@@ -417,7 +417,7 @@ class RecipeSearch(QueryRepository):
             ingredients = prefilter.pop('ingredients')
             ingredients = ingredients['choices']['products']['buckets']
             ingredients.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
-            prefilter['ingredients'] = ingredients
+            prefilter['ingredients'] = {'buckets': ingredients}
 
         facets = {}
         for field, content in results['aggregations']['prefilter'].items():
