@@ -35,8 +35,13 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_exclude_clause(exclude):
-        # match any ingredients in the exclude list
-        return [{'match': {'contents': exc}} for exc in exclude]
+        return [
+            # exclude 'hidden' recipes
+            {'match': {'hidden': True}},
+        ] + [
+            # match any ingredients in the exclude list
+            {'match': {'contents': exc}} for exc in exclude
+        ]
 
     @staticmethod
     def _generate_equipment_clause(equipment):
@@ -131,9 +136,7 @@ class RecipeSearch(QueryRepository):
         sort_params = self._generate_sort_method(include, sort)
 
         should = include_exact_clause if exact_match else include_clause
-        must_not = exclude_clause + [
-            {'match': {'hidden': True}},
-        ]
+        must_not = exclude_clause
         filter = equipment_clause + [
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
