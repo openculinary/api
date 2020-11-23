@@ -123,7 +123,7 @@ class RecipeSearch(QueryRepository):
 
     def _product_aggregatation(self):
         return {
-            'products': {
+            'singular': {
                 'terms': {
                     'field': 'ingredients.product.singular',
                     'order': {'_count': 'desc'},
@@ -136,7 +136,7 @@ class RecipeSearch(QueryRepository):
         product_filter = self._product_filter(include)
         product_aggregation = self._product_aggregatation()
         return {
-            'ingredients': {
+            'products': {
                 'nested': {'path': 'ingredients'},
                 'aggs': {
                     'choices': {
@@ -414,10 +414,9 @@ class RecipeSearch(QueryRepository):
             prefilter = results['aggregations']['prefilter']
             total = prefilter['doc_count']
 
-            ingredients = prefilter.pop('ingredients')
-            ingredients = ingredients['choices']['products']['buckets']
-            ingredients.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
-            prefilter['ingredients'] = {'buckets': ingredients}
+            products = prefilter['products']['choices']['singular']['buckets']
+            products.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
+            prefilter['products'] = {'buckets': products}
 
         facets = {}
         for field, content in results['aggregations']['prefilter'].items():
