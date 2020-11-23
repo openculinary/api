@@ -463,5 +463,6 @@ class RecipeSearch(QueryRepository):
         return {
             'authority': 'api',
             'choices': choices,
+            'total': min(results['hits']['total']['value'], 25 * limit),
             'results': recipes,
         }
