@@ -457,7 +457,7 @@ class RecipeSearch(QueryRepository):
         }
 
     def explore(self, include, exclude, dietary_properties):
-        depth = len(include) + len(exclude)
+        depth = len(set(include + exclude))
         limit = 10 if depth >= 3 else 0
         return self.query(
             include=include,
