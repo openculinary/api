@@ -134,7 +134,7 @@ class RecipeSearch(QueryRepository):
                 'terms': {
                     'field': 'ingredients.product.singular',
                     'order': {'_count': 'desc'},
-                    'size': 10
+                    'size': 50
                 }
             }
         }
