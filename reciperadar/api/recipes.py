@@ -94,3 +94,18 @@ def recipe_search():
     )
 
     return jsonify(results)
+
+
+@app.route('/recipes/explore')
+def recipe_explore():
+    include = request.args.getlist('include[]')
+    exclude = request.args.getlist('exclude[]')
+    dietary_properties = extract_dietary_properties(request.args)
+
+    results = RecipeSearch().explore(
+        include=include,
+        exclude=exclude,
+        dietary_properties=dietary_properties,
+    )
+
+    return jsonify(results)

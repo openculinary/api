@@ -100,11 +100,73 @@ class RecipeSearch(QueryRepository):
             return {'script': 'doc.rating.value', 'order': 'desc'}
         return self.sort_methods()[sort]
 
-    def _generate_aggregations(self, facets):
+    def _domain_facets(self):
+        return {
+            'domains': {
+                'terms': {'field': 'domain', 'size': 100}
+            }
+        }
+
+    def _product_filter(self, include, dietary_properties):
+        return {
+            'bool': {
+                'must': [
+                    {'term': {f'ingredients.product.{dietary_property}': True}}
+                    for dietary_property in [
+                        f'is_{dietary_property.replace("-", "_")}'
+                        for dietary_property in dietary_properties
+                    ]
+                ],
+                'must_not': [
+                    # Do not present staple ingredients as choices
+                    {'term': {'ingredients.product.is_kitchen_staple': True}}
+                ] + [
+                    # Do not present already-selected ingredients as choices
+                    {'term': {'ingredients.product.singular': inc}}
+                    for inc in include
+                ]
+            }
+        }
+
+    def _product_aggregatation(self):
+        return {
+            'singular': {
+                'terms': {
+                    'field': 'ingredients.product.singular',
+                    'order': {'_count': 'desc'},
+                    'size': 50
+                }
+            }
+        }
+
+    def _product_suggestions(self, include, dietary_properties):
+        product_filter = self._product_filter(include, dietary_properties)
+        product_aggregation = self._product_aggregatation()
+        return {
+            'products': {
+                'nested': {'path': 'ingredients'},
+                'aggs': {
+                    'choices': {
+                        'filter': product_filter,
+                        'aggs': product_aggregation,
+                    }
+                }
+            }
+        }
+
+    def _generate_aggregations(self, suggest_products, include,
+                               dietary_properties):
+        aggregations = {
+            **self._domain_facets(),
+            **(
+                self._product_suggestions(include, dietary_properties)
+                if suggest_products else {}
+            )
+        }
         return {
             'prefilter': {
                 'filter': {'match_all': {}},
-                'aggs': facets,
+                'aggs': aggregations,
             }
         }
 
@@ -205,7 +267,8 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, 'match_any'
 
     def query(self, include, exclude, equipment, offset, limit, sort, domains,
-              dietary_properties, allow_refinement=True):
+              dietary_properties, allow_refinement=True,
+              suggest_products=False):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -326,14 +389,15 @@ class RecipeSearch(QueryRepository):
         limit = max(0, limit)
         limit = min(25, limit)
 
-        facets = {
-            'domains': {
-                'terms': {'field': 'domain', 'size': 100},
-            }
-        }
-
-        aggregations = self._generate_aggregations(facets)
-        post_filter = self._generate_post_filter(domains, dietary_properties)
+        aggregations = self._generate_aggregations(
+            suggest_products=suggest_products,
+            include=include,
+            dietary_properties=dietary_properties
+        )
+        post_filter = self._generate_post_filter(
+            domains=domains,
+            dietary_properties=dietary_properties
+        )
 
         queries = self._refined_queries(
             include=include,
@@ -363,6 +427,15 @@ class RecipeSearch(QueryRepository):
             recipe = Recipe.from_doc(result['_source'])
             recipes.append(recipe.to_dict(include))
 
+        # TODO: Can this bucket sorting be moved into the aggregation pipeline?
+        if suggest_products:
+            prefilter = results['aggregations']['prefilter']
+            total = prefilter['doc_count']
+
+            products = prefilter['products']['choices']['singular']['buckets']
+            products.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
+            prefilter['products'] = {'buckets': products[:10]}
+
         facets = {}
         for field, content in results['aggregations']['prefilter'].items():
             if not isinstance(content, dict) or 'buckets' not in content:
@@ -382,3 +455,19 @@ class RecipeSearch(QueryRepository):
             'facets': facets,
             'refinements': [refinement] if recipes and refinement else []
         }
+
+    def explore(self, include, exclude, dietary_properties):
+        depth = len(set(include + exclude))
+        limit = 10 if depth >= 3 else 0
+        return self.query(
+            include=include,
+            exclude=exclude,
+            equipment=[],
+            offset=0,
+            limit=limit,
+            sort=None,
+            domains={},
+            dietary_properties=dietary_properties,
+            allow_refinement=False,
+            suggest_products=True
+        )
