@@ -442,7 +442,7 @@ class RecipeSearch(QueryRepository):
                 continue
             facets[field] = [
                 {
-                    'id': bucket['key'],
+                    'key': bucket['key'],
                     'count': min(bucket['doc_count'], 100),
                 }
                 for bucket in content['buckets']
