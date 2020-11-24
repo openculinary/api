@@ -440,10 +440,13 @@ class RecipeSearch(QueryRepository):
         for field, content in results['aggregations']['prefilter'].items():
             if not isinstance(content, dict) or 'buckets' not in content:
                 continue
-            facets[field] = {
-                bucket['key']: min(bucket['doc_count'], 100)
+            facets[field] = [
+                {
+                    'id': bucket['key'],
+                    'count': min(bucket['doc_count'], 100),
+                }
                 for bucket in content['buckets']
-            }
+            ]
 
         return {
             'authority': 'api',
