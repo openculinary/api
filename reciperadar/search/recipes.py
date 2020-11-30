@@ -43,8 +43,7 @@ class RecipeSearch(QueryRepository):
         ] + [
             # match any ingredients in the exclude list
             {'match': {'contents': ingredient.term}}
-            for ingredient in ingredients
-            if not ingredient.positive
+            for ingredient in ingredients if not ingredient.positive
         ]
 
     @staticmethod
