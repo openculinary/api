@@ -96,8 +96,8 @@ def recipe_search():
 
 @app.route('/recipes/explore')
 def recipe_explore():
-    include = request.args.getlist('include[]')
-    exclude = request.args.getlist('exclude[]')
+    include = EntityClause.from_args(request.args.getlist('include[]'))
+    exclude = EntityClause.from_args(request.args.getlist('exclude[]'))
     dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     # TODO: Remove: backwards-compatibility
