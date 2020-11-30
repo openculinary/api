@@ -35,8 +35,8 @@ def dietary_args(args):
 
 @app.route('/recipes/search')
 def recipe_search():
-    include = request.args.getlist('include[]')
-    exclude = request.args.getlist('exclude[]')
+    include = EntityClause.from_args(request.args.getlist('include[]'))
+    exclude = EntityClause.from_args(request.args.getlist('exclude[]'))
     equipment = EntityClause.from_args(request.args.getlist('equipment[]'))
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
@@ -47,9 +47,17 @@ def recipe_search():
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
 
+    # TODO: Remove: backwards-compatibility
+    # Disable the 'positive' flag on excluded ingredients
+    for ingredient in exclude:
+        ingredient.positive = False
+
+    # TODO: Remove: backwards-compatibility
+    # Combine the include and exclude ingredient lists
+    ingredients = include + exclude
+
     results = RecipeSearch().query(
-        include=include,
-        exclude=exclude,
+        ingredients=ingredients,
         equipment=equipment,
         offset=offset,
         limit=limit,
@@ -90,9 +98,17 @@ def recipe_explore():
     exclude = request.args.getlist('exclude[]')
     dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
+    # TODO: Remove: backwards-compatibility
+    # Disable the 'positive' flag on excluded ingredients
+    for ingredient in exclude:
+        ingredient.positive = False
+
+    # TODO: Remove: backwards-compatibility
+    # Combine the include and exclude ingredient lists
+    ingredients = include + exclude
+
     results = RecipeSearch().explore(
-        include=include,
-        exclude=exclude,
+        ingredients=ingredients,
         dietary_properties=dietary_properties,
     )
 

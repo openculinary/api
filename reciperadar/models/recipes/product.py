@@ -31,19 +31,20 @@ class Product(Storable):
             contents=doc.get('contents'),
         )
 
-    def state(self, include):
+    def state(self, ingredients):
         states = {
             True: Product.STATE_AVAILABLE,
             False: Product.STATE_REQUIRED,
         }
-        available = bool(set(self.contents or []) & set(include or []))
+        include = [x.term for x in ingredients or [] if x.positive]
+        available = bool(set(self.contents or []) & set(include))
         return states[available]
 
-    def to_dict(self, include):
+    def to_dict(self, ingredients):
         return {
             'id': self.id,
             'category': self.category,
             'singular': self.singular,
             'plural': self.plural,
-            'state': self.state(include),
+            'state': self.state(ingredients),
         }

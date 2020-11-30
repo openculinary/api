@@ -90,13 +90,13 @@ class Recipe(Storable, Searchable):
             if doc.get('nutrition') else None
         )
 
-    def to_dict(self, include=None):
+    def to_dict(self, ingredients=None):
         return {
             'id': self.id,
             'title': self.title,
             'time': self.time,
             'ingredients': [
-                ingredient.to_dict(include)
+                ingredient.to_dict(ingredients)
                 for ingredient in self.ingredients
             ],
             'directions': [
