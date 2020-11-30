@@ -23,14 +23,12 @@ def recipe_view(recipe_id):
 
 
 def dietary_args(args):
-    return [
-        f'is_{arg.replace("-", "_")}' for arg in args if arg in {
-            'dairy-free',
-            'gluten-free',
-            'vegan',
-            'vegetarian',
-        }
-    ]
+    return [f'is_{arg.replace("-", "_")}' for arg in args if arg in {
+        'dairy-free',
+        'gluten-free',
+        'vegan',
+        'vegetarian',
+    }]
 
 
 @app.route('/recipes/search')
