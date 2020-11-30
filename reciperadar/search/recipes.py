@@ -174,7 +174,7 @@ class RecipeSearch(QueryRepository):
         conditions = defaultdict(list)
         for domain in domains:
             clause = 'must' if domain.positive else 'must_not'
-            conditions[clause] += {'match': {'domain': domain.term}}
+            conditions[clause].append({'match': {'domain': domain.term}})
         if dietary_properties:
             conditions['must'] += [
                 {'match': {f'is_{dietary_property.replace("-", "_")}': True}}
