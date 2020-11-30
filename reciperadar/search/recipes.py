@@ -1,14 +1,14 @@
 from collections import defaultdict
 
 from reciperadar.models.recipes import Recipe
-from reciperadar.search.base import QueryRepository
+from reciperadar.search.base import EntityClause, QueryRepository
 
 
 class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_include_clause(ingredients):
-        include = [x.term for x in ingredients if x.positive]
+        include = EntityClause.term_list(ingredients, lambda x: x.positive)
         return [{
             'constant_score': {
                 'boost': pow(10, idx),
@@ -20,7 +20,7 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_include_exact_clause(ingredients):
-        include = [x.term for x in ingredients if x.positive]
+        include = EntityClause.term_list(ingredients, lambda x: x.positive)
         return [{
             'nested': {
                 'path': 'ingredients',

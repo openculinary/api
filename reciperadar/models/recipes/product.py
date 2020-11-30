@@ -2,6 +2,7 @@ from sqlalchemy.dialects import postgresql
 
 from reciperadar import db
 from reciperadar.models.base import Storable
+from reciperadar.search.base import EntityClause
 
 
 class Product(Storable):
@@ -32,11 +33,12 @@ class Product(Storable):
         )
 
     def state(self, ingredients):
+        ingredients = ingredients or []
         states = {
             True: Product.STATE_AVAILABLE,
             False: Product.STATE_REQUIRED,
         }
-        include = [x.term for x in ingredients or [] if x.positive]
+        include = EntityClause.term_list(ingredients, lambda x: x.positive)
         available = bool(set(self.contents or []) & set(include))
         return states[available]
 
