@@ -125,7 +125,7 @@ class RecipeSearch(QueryRepository):
         for dietary_property in dietary_properties:
             field = f'ingredients.product.{dietary_property.term}'
             clause = {'term': {field: True}}
-            conditions['must'].append(clause)
+            conditions['filter'].append(clause)
 
         return {'bool': conditions}
 
@@ -174,10 +174,10 @@ class RecipeSearch(QueryRepository):
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         for domain in domains:
-            clause = 'must' if domain.positive else 'must_not'
+            clause = 'filter' if domain.positive else 'must_not'
             conditions[clause].append({'match': {'domain': domain.term}})
         for dietary_property in dietary_properties:
-            conditions['must'].append({'match': {dietary_property.term: True}})
+            conditions['filter'].append({'match': {dietary_property.term: True}})
         return {'bool': conditions}
 
     def _render_query(self, include, exclude, equipment, sort,
