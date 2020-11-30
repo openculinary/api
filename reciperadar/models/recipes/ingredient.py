@@ -65,11 +65,11 @@ class RecipeIngredient(Storable):
             verb=doc.get('verb'),
         )
 
-    def to_dict(self, include=None):
+    def to_dict(self, ingredients=None):
         return {
             'markup': self.markup,
             'product': {
-                **self.product.to_dict(include),
+                **self.product.to_dict(ingredients),
                 # TODO: would a 'countable' flag on products be preferable?
                 **{'name': self.product_name},
                 # TODO: these fields are provided for backwards-compatibility

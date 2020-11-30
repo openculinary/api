@@ -3,6 +3,7 @@ from user_agents import parse as ua_parser
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
+from reciperadar.search.base import EntityClause
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
@@ -21,48 +22,40 @@ def recipe_view(recipe_id):
     return jsonify(results)
 
 
-def partition_query_terms(terms):
-    partitions = {'include': [], 'exclude': []}
-    for term in terms:
-        term_length = len(term)
-        term = term.lstrip('-')
-        partition = 'include' if len(term) == term_length else 'exclude'
-        partitions[partition].append(term)
-    return partitions
-
-
-def extract_dietary_properties(args):
-    return {
-        dietary_property: True
-        for dietary_property in [
-            'dairy-free',
-            'gluten-free',
-            'vegan',
-            'vegetarian',
-        ]
-        if dietary_property in args
-    }
+def dietary_args(args):
+    return [f'is_{arg.replace("-", "_")}' for arg in args if arg in {
+        'dairy-free',
+        'gluten-free',
+        'vegan',
+        'vegetarian',
+    }]
 
 
 @app.route('/recipes/search')
 def recipe_search():
-    include = request.args.getlist('include[]')
-    exclude = request.args.getlist('exclude[]')
-    equipment = request.args.getlist('equipment[]')
+    include = EntityClause.from_args(request.args.getlist('include[]'))
+    exclude = EntityClause.from_args(request.args.getlist('exclude[]'))
+    equipment = EntityClause.from_args(request.args.getlist('equipment[]'))
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
-    domains = request.args.getlist('domains[]')
-    dietary_properties = extract_dietary_properties(request.args)
+    domains = EntityClause.from_args(request.args.getlist('domains[]'))
+    dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
 
-    domains = partition_query_terms(domains)
+    # TODO: Remove: backwards-compatibility
+    # Disable the 'positive' flag on excluded ingredients
+    for ingredient in exclude:
+        ingredient.positive = False
+
+    # TODO: Remove: backwards-compatibility
+    # Combine the include and exclude ingredient lists
+    ingredients = include + exclude
 
     results = RecipeSearch().query(
-        include=include,
-        exclude=exclude,
+        ingredients=ingredients,
         equipment=equipment,
         offset=offset,
         limit=limit,
@@ -75,6 +68,9 @@ def recipe_search():
     suspected_bot = ua_parser(user_agent or '').is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
+    equipment = EntityClause.term_list(equipment)
+    include = EntityClause.term_list(ingredients, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
     recrawl_search.delay(include, exclude, equipment, offset)
 
     # Log a search event
@@ -98,13 +94,11 @@ def recipe_search():
 
 @app.route('/recipes/explore')
 def recipe_explore():
-    include = request.args.getlist('include[]')
-    exclude = request.args.getlist('exclude[]')
-    dietary_properties = extract_dietary_properties(request.args)
+    ingredients = EntityClause.from_args(request.args.getlist('ingredients[]'))
+    dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     results = RecipeSearch().explore(
-        include=include,
-        exclude=exclude,
+        ingredients=ingredients,
         dietary_properties=dietary_properties,
     )
 
