@@ -172,16 +172,9 @@ class RecipeSearch(QueryRepository):
 
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
-        if domains.get('include'):
-            conditions['must'] += [
-                {'match': {'domain': domain}}
-                for domain in domains['include']
-            ]
-        if domains.get('exclude'):
-            conditions['must_not'] += [
-                {'match': {'domain': domain}}
-                for domain in domains['exclude']
-            ]
+        for domain in domains:
+            clause = 'must' if domain.positive else 'must_not'
+            conditions[clause] += {'match': {'domain': domain.term}}
         if dietary_properties:
             conditions['must'] += [
                 {'match': {f'is_{dietary_property.replace("-", "_")}': True}}
@@ -467,7 +460,7 @@ class RecipeSearch(QueryRepository):
             offset=0,
             limit=limit,
             sort=None,
-            domains={},
+            domains=[],
             dietary_properties=dietary_properties,
             allow_refinement=False,
             suggest_products=True

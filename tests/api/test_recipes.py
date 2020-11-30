@@ -1,16 +1,6 @@
 from unittest.mock import patch
 
-from reciperadar.api.recipes import partition_query_terms
 from reciperadar.search.recipes import RecipeSearch
-
-
-def test_query_term_partitioning():
-    terms = ['tomato', '-garlic', 'olives']
-    partitions = partition_query_terms(terms)
-    assert partitions == {
-        'include': ['tomato', 'olives'],
-        'exclude': ['garlic'],
-    }
 
 
 @patch.object(RecipeSearch, 'query')

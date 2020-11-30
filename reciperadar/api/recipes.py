@@ -3,6 +3,7 @@ from user_agents import parse as ua_parser
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
+from reciperadar.search.base import EntityClause
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
@@ -19,16 +20,6 @@ def recipe_view(recipe_id):
         'results': [recipe.to_dict()],
     }
     return jsonify(results)
-
-
-def partition_query_terms(terms):
-    partitions = {'include': [], 'exclude': []}
-    for term in terms:
-        term_length = len(term)
-        term = term.lstrip('-')
-        partition = 'include' if len(term) == term_length else 'exclude'
-        partitions[partition].append(term)
-    return partitions
 
 
 def extract_dietary_properties(args):
@@ -52,13 +43,11 @@ def recipe_search():
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
-    domains = request.args.getlist('domains[]')
+    domains = EntityClause.from_args(request.args.getlist('domains[]'))
     dietary_properties = extract_dietary_properties(request.args)
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
-
-    domains = partition_query_terms(domains)
 
     results = RecipeSearch().query(
         include=include,
