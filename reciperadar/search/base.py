@@ -11,9 +11,7 @@ class EntityClause(object):
 
     @staticmethod
     def from_arg(arg):
-        positive = not arg.startswith('-')
-        term = arg.lstrip('-')
-        return EntityClause(term, positive)
+        return EntityClause(arg.lstrip('-'), positive=not arg.startswith('-'))
 
     @staticmethod
     def from_args(args):
