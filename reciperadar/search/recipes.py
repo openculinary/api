@@ -433,6 +433,7 @@ class RecipeSearch(QueryRepository):
             total = prefilter['doc_count']
 
             products = prefilter['products']['choices']['singular']['buckets']
+            products = [x for x in products if x['doc_count'] != total]
             products.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
             prefilter['products'] = {'buckets': products[:10]}
 
