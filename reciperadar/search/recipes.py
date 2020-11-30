@@ -108,25 +108,26 @@ class RecipeSearch(QueryRepository):
         }
 
     def _product_filter(self, include, dietary_properties):
-        return {
-            'bool': {
-                'must': [
-                    {'term': {f'ingredients.product.{dietary_property}': True}}
-                    for dietary_property in [
-                        f'is_{dietary_property.replace("-", "_")}'
-                        for dietary_property in dietary_properties
-                    ]
-                ],
-                'must_not': [
-                    # Do not present staple ingredients as choices
-                    {'term': {'ingredients.product.is_kitchen_staple': True}}
-                ] + [
-                    # Do not present already-selected ingredients as choices
-                    {'term': {'ingredients.product.singular': inc}}
-                    for inc in include
-                ]
-            }
-        }
+        conditions = defaultdict(list)
+
+        # Do not present staple ingredients as choices
+        field = 'ingredients.product.is_kitchen_staple'
+        clause = {'term': {field: True}}
+        conditions['must_not'].append(clause)
+
+        # Do not present already-selected ingredients as choices
+        for product in include:
+            field = 'ingredients.product.singular'
+            clause = {'term': {field: product}}
+            conditions['must_not'].append(clause)
+
+        # Filter to products that satisfy the user's dietary requirements
+        for dietary_property in dietary_properties:
+            field = f'ingredients.product.{dietary_property.term}'
+            clause = {'term': {field: True}}
+            conditions['must'].append(clause)
+
+        return {'bool': conditions}
 
     def _product_aggregatation(self):
         return {
@@ -175,11 +176,8 @@ class RecipeSearch(QueryRepository):
         for domain in domains:
             clause = 'must' if domain.positive else 'must_not'
             conditions[clause].append({'match': {'domain': domain.term}})
-        if dietary_properties:
-            conditions['must'] += [
-                {'match': {f'is_{dietary_property.replace("-", "_")}': True}}
-                for dietary_property in dietary_properties
-            ]
+        for dietary_property in dietary_properties:
+            conditions['must'].append({'match': {dietary_property.term: True}})
         return {'bool': conditions}
 
     def _render_query(self, include, exclude, equipment, sort,

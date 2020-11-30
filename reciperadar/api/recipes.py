@@ -22,17 +22,15 @@ def recipe_view(recipe_id):
     return jsonify(results)
 
 
-def extract_dietary_properties(args):
-    return {
-        dietary_property: True
-        for dietary_property in [
+def dietary_args(args):
+    return [
+        f'is_{arg.replace("-", "_")}' for arg in args if arg in {
             'dairy-free',
             'gluten-free',
             'vegan',
             'vegetarian',
-        ]
-        if dietary_property in args
-    }
+        }
+    ]
 
 
 @app.route('/recipes/search')
@@ -44,7 +42,7 @@ def recipe_search():
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
     domains = EntityClause.from_args(request.args.getlist('domains[]'))
-    dietary_properties = extract_dietary_properties(request.args)
+    dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
@@ -89,7 +87,7 @@ def recipe_search():
 def recipe_explore():
     include = request.args.getlist('include[]')
     exclude = request.args.getlist('exclude[]')
-    dietary_properties = extract_dietary_properties(request.args)
+    dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     results = RecipeSearch().explore(
         include=include,
