@@ -21,10 +21,7 @@ class EntityClause(object):
 
     @staticmethod
     def term_list(clauses, condition=lambda x: True):
-        terms = set()
-        for clause in filter(condition, clauses):
-            terms.add(clause.term)
-        return list(terms)
+        return list(set(map(lambda x: x.term, filter(condition, clauses))))
 
 
 class QueryRepository(object):
