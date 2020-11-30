@@ -51,10 +51,9 @@ class RecipeSearch(QueryRepository):
     def _generate_equipment_clause(equipment):
         conditions = defaultdict(list)
         for item in equipment:
-            field = 'directions.equipment.equipment'
-            clause = {'match': {field: item.term}}
             condition = 'filter' if item.positive else 'must_not'
-            conditions[condition].append(clause)
+            match = {'match': {'directions.equipment.equipment': item.term}}
+            conditions[condition].append(match)
         return conditions
 
     @staticmethod
@@ -118,21 +117,19 @@ class RecipeSearch(QueryRepository):
         conditions = defaultdict(list)
 
         # Do not present staple ingredients as choices
-        field = 'ingredients.product.is_kitchen_staple'
-        clause = {'term': {field: True}}
-        conditions['must_not'].append(clause)
+        match = {'term': {'ingredients.product.is_kitchen_staple': True}}
+        conditions['must_not'].append(match)
 
         # Do not present already-selected ingredients as choices
         for ingredient in ingredients:
-            field = 'ingredients.product.singular'
-            clause = {'term': {field: ingredient.term}}
-            conditions['must_not'].append(clause)
+            match = {'term': {'ingredients.product.singular': ingredient.term}}
+            conditions['must_not'].append(match)
 
         # Filter to products that satisfy the user's dietary requirements
         for dietary_property in dietary_properties:
             field = f'ingredients.product.{dietary_property.term}'
-            clause = {'term': {field: True}}
-            conditions['filter'].append(clause)
+            match = {'term': {field: True}}
+            conditions['filter'].append(match)
 
         return {'bool': conditions}
 
@@ -181,14 +178,12 @@ class RecipeSearch(QueryRepository):
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         for domain in domains:
-            field = domain.term
-            clause = {'match': {'domain': domain.term}}
             condition = 'filter' if domain.positive else 'must_not'
-            conditions[condition].append(clause)
+            match = {'match': {'domain': domain.term}}
+            conditions[condition].append(match)
         for dietary_property in dietary_properties:
-            field = dietary_property.term
-            clause = {'match': {field: True}}
-            conditions['filter'].append(clause)
+            match = {'match': {dietary_property.term: True}}
+            conditions['filter'].append(match)
         return {'bool': conditions}
 
     def _render_query(self, ingredients, equipment, sort, exact_match=True,
