@@ -98,6 +98,7 @@ def recipe_search():
 def recipe_explore():
     include = EntityClause.from_args(request.args.getlist('include[]'))
     exclude = EntityClause.from_args(request.args.getlist('exclude[]'))
+    ingredients = EntityClause.from_args(request.args.getlist('ingredients[]'))
     dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     # TODO: Remove: backwards-compatibility
@@ -107,7 +108,7 @@ def recipe_explore():
 
     # TODO: Remove: backwards-compatibility
     # Combine the include and exclude ingredient lists
-    ingredients = include + exclude
+    ingredients = ingredients + include + exclude
 
     results = RecipeSearch().explore(
         ingredients=ingredients,
