@@ -33,6 +33,13 @@ def dietary_args(args):
     ]
 
 
+def term_list(clauses, condition=lambda x: True):
+    terms = set()
+    for clause in filter(condition, clauses):
+        terms.add(clause.term)
+    return list(terms)
+
+
 @app.route('/recipes/search')
 def recipe_search():
     include = EntityClause.from_args(request.args.getlist('include[]'))
@@ -70,16 +77,18 @@ def recipe_search():
     suspected_bot = ua_parser(user_agent or '').is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
-    equipment_terms = [item.term for item in equipment]
-    recrawl_search.delay(include, exclude, equipment_terms, offset)
+    equipment_terms = term_list(equipment)
+    include_terms = term_list(ingredients, lambda x: x.positive)
+    exclude_terms = term_list(ingredients, lambda x: not x.positive)
+    recrawl_search.delay(include_terms, exclude_terms, equipment_terms, offset)
 
     # Log a search event
     store_event.delay(
         event_table='searches',
         event_data={
             'suspected_bot': suspected_bot,
-            'include': include,
-            'exclude': exclude,
+            'include': include_terms,
+            'exclude': exclude_terms,
             'equipment': equipment_terms,
             'offset': offset,
             'limit': limit,
