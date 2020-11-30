@@ -37,7 +37,7 @@ def dietary_args(args):
 def recipe_search():
     include = request.args.getlist('include[]')
     exclude = request.args.getlist('exclude[]')
-    equipment = request.args.getlist('equipment[]')
+    equipment = EntityClause.from_args(request.args.getlist('equipment[]'))
     offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
     limit = min(request.args.get('limit', type=int, default=10), 10)
     sort = request.args.get('sort', type=str)
@@ -62,7 +62,8 @@ def recipe_search():
     suspected_bot = ua_parser(user_agent or '').is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
-    recrawl_search.delay(include, exclude, equipment, offset)
+    equipment_terms = [item.term for item in equipment]
+    recrawl_search.delay(include, exclude, equipment_terms, offset)
 
     # Log a search event
     store_event.delay(
@@ -71,7 +72,7 @@ def recipe_search():
             'suspected_bot': suspected_bot,
             'include': include,
             'exclude': exclude,
-            'equipment': equipment,
+            'equipment': equipment_terms,
             'offset': offset,
             'limit': limit,
             'sort': sort,
