@@ -177,7 +177,9 @@ class RecipeSearch(QueryRepository):
             clause = 'filter' if domain.positive else 'must_not'
             conditions[clause].append({'match': {'domain': domain.term}})
         for dietary_property in dietary_properties:
-            conditions['filter'].append({'match': {dietary_property.term: True}})
+            field = dietary_property.term
+            clause = {'match': {field: True}}
+            conditions['filter'].append(clause)
         return {'bool': conditions}
 
     def _render_query(self, include, exclude, equipment, sort,
