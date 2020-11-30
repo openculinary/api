@@ -54,7 +54,7 @@ class RecipeSearch(QueryRepository):
             condition = 'filter' if item.positive else 'must_not'
             match = {'match': {'directions.equipment.equipment': item.term}}
             conditions[condition].append(match)
-        return conditions
+        return {'bool': conditions}
 
     @staticmethod
     def sort_methods():
@@ -196,8 +196,7 @@ class RecipeSearch(QueryRepository):
 
         should = include_exact_clause if exact_match else include_clause
         must_not = exclude_clause
-        filter = [
-            {'bool': equipment_clause},
+        filter = [equipment_clause] + [
             {'range': {'time': {'gte': 5}}},
             {'range': {'product_count': {'gt': 0}}},
         ]
