@@ -174,8 +174,10 @@ class RecipeSearch(QueryRepository):
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         for domain in domains:
-            clause = 'filter' if domain.positive else 'must_not'
-            conditions[clause].append({'match': {'domain': domain.term}})
+            field = domain.term
+            clause = {'match': {'domain': domain.term}}
+            condition = 'filter' if domain.positive else 'must_not'
+            conditions[condition].append(clause)
         for dietary_property in dietary_properties:
             field = dietary_property.term
             clause = {'match': {field: True}}
