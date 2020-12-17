@@ -7,32 +7,37 @@ class Nutrition(Storable):
 
     id = db.Column(db.String, primary_key=True)
     carbohydrates = db.Column(db.Float)
+    carbohydrates_units = db.Column(db.String)
     energy = db.Column(db.Float)
+    energy_units = db.Column(db.String)
     fat = db.Column(db.Float)
+    fat_units = db.Column(db.String)
     fibre = db.Column(db.Float)
+    fibre_units = db.Column(db.String)
     protein = db.Column(db.Float)
+    protein_units = db.Column(db.String)
 
     def to_dict(self):
         return {
             'carbohydrates': {
                 'magnitude': self.carbohydrates,
-                'units': 'g',
+                'units': self.carbohydrates_units,
             },
             'energy': {
                 'magnitude': self.energy,
-                'units': 'cal',
+                'units': self.energy_units,
             },
             'fat': {
                 'magnitude': self.fat,
-                'units': 'g',
+                'units': self.fat_units,
             },
             'fibre': {
                 'magnitude': self.fibre,
-                'units': 'g',
+                'units': self.fibre_units,
             },
             'protein': {
                 'magnitude': self.protein,
-                'units': 'g',
+                'units': self.protein_units,
             },
         }
 
@@ -49,10 +54,15 @@ class IngredientNutrition(Nutrition):
         return IngredientNutrition(
             id=nutrition_id,
             carbohydrates=doc.get('carbohydrates'),
+            carbohydrates_units=doc.get('carbohydrates_units'),
             energy=doc.get('energy'),
+            energy_units=doc.get('energy_units'),
             fat=doc.get('fat'),
+            fat_units=doc.get('fat_units'),
             fibre=doc.get('fibre'),
+            fibre_units=doc.get('fibre_units'),
             protein=doc.get('protein'),
+            protein_units=doc.get('protein_units'),
         )
 
 
@@ -68,8 +78,13 @@ class RecipeNutrition(Nutrition):
         return RecipeNutrition(
             id=nutrition_id,
             carbohydrates=doc.get('carbohydrates'),
+            carbohydrates_units=doc.get('carbohydrates_units'),
             energy=doc.get('energy'),
+            energy_units=doc.get('energy_units'),
             fat=doc.get('fat'),
+            fat_units=doc.get('fat_units'),
             fibre=doc.get('fibre'),
+            fibre_units=doc.get('fibre_units'),
             protein=doc.get('protein'),
+            protein_units=doc.get('protein_units'),
         )
