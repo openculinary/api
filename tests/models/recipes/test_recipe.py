@@ -35,3 +35,12 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert not recipe.is_gluten_free
     assert not recipe.is_vegan
     assert recipe.is_vegetarian
+
+
+def test_nutrition_source(raw_recipe_hit):
+    recipe = Recipe().from_doc(raw_recipe_hit['_source'])
+    doc = recipe.to_dict()
+
+    assert recipe.nutrition is not None
+    assert 'nutrition' in doc
+    assert doc['nutrition'] is None

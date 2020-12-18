@@ -20,6 +20,7 @@ class Recipe(Storable, Searchable):
     servings = db.Column(db.Integer)
     rating = db.Column(db.Float)
     nutrition = db.Column(db.JSON)
+    nutrition_source = db.Column(db.String)
     ingredients = db.relationship(
         'RecipeIngredient',
         passive_deletes='all'
@@ -87,6 +88,7 @@ class Recipe(Storable, Searchable):
             ],
             nutrition=RecipeNutrition.from_doc(doc['nutrition'])
             if doc.get('nutrition') else None,
+            nutrition_source=doc.get('nutrition_source'),
             is_dairy_free=doc.get('is_dairy_free'),
             is_gluten_free=doc.get('is_gluten_free'),
             is_vegan=doc.get('is_vegan'),
@@ -116,7 +118,8 @@ class Recipe(Storable, Searchable):
             'author': self.author,
             'author_url': self.author_url,
             'image_url': self.image_path,
-            'nutrition': self.nutrition.to_dict() if self.nutrition else None,
+            'nutrition': self.nutrition.to_dict() if
+            self.nutrition and self.nutrition_source == 'crawler' else None,
             'is_dairy_free': self.is_dairy_free,
             'is_gluten_free': self.is_gluten_free,
             'is_vegan': self.is_vegan,
