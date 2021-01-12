@@ -8,9 +8,9 @@ attrs==20.3.0 \
     --hash=sha256:31b2eced602aa8423c2aea9c76a724617ed67cf9513173fd3a4f03e3a929c7e6 \
     --hash=sha256:832aa3cde19744e49938b91fea06d69ecb9e649c93ba974535d08ad92164f700
     # via pytest
-base58==2.0.1 \
-    --hash=sha256:365c9561d9babac1b5f18ee797508cd54937a724b6e419a130abad69cec5ca79 \
-    --hash=sha256:447adc750d6b642987ffc6d397ecd15a799852d5f6a1d308d384500243825058
+basest==0.7.3 \
+    --hash=sha256:57468bcff59306dde1943fb3e3839aafd8f9e11ad29909e4768b93e8bdf213a9 \
+    --hash=sha256:77449eaa031182a205c69811d341830a16a9d9e258e10fd5504b89b23ad8066f
     # via -r requirements.txt
 billiard==3.6.3.0 \
     --hash=sha256:bff575450859a6e0fbc2f9877d9b715b0bbc07c3565bb7ed2280526a0cdf5ede \
