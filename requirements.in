@@ -1,6 +1,6 @@
 basest==0.7.3
 celery==5.0.5
-elasticsearch==7.12.0
+elasticsearch==7.12.1
 flask==1.1.2
 flask-cors==3.0.10
 flask-mail==0.9.1

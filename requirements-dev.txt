@@ -65,9 +65,9 @@ click==7.1.2 \
     #   click-plugins
     #   click-repl
     #   flask
-elasticsearch==7.12.0 \
-    --hash=sha256:9a77172be02bc4855210d83f0f1346a1e7d421e3cb2ca47ba81ac0c5a717b3a0 \
-    --hash=sha256:c67b0f6541eda6de9f92eaea319c070aa2710c5d4d4ee5e3dfa3c21bd95aa378
+elasticsearch==7.12.1 \
+    --hash=sha256:1840fea8c305224b8c28acabc8697f739cdfb03618f2d2427b42838971a787f6 \
+    --hash=sha256:df35d8c638f946f098a74681b18611bdf27ba469fa2063e3dfc8bdc290b11419
     # via -r requirements.txt
 flake8==3.9.1 \
     --hash=sha256:1aa8990be1e689d96c745c5682b687ea49f2e05a443aff1f8251092b0014e378 \
@@ -140,6 +140,7 @@ greenlet==1.0.0 \
     #   -r requirements.txt
     #   sqlalchemy
 gunicorn==20.1.0 \
+    --hash=sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e \
     --hash=sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8
     # via -r requirements.txt
 idna==2.10 \
@@ -272,9 +273,9 @@ requests==2.25.1 \
     --hash=sha256:27973dd4a904a4f13b263a19c866c13b92a39ed1c964655f025f3f8d3d75b804 \
     --hash=sha256:c210084e36a42ae6b9219e00e48287def368a26d03a048ddad7bfee44f75871e
     # via responses
-responses==0.13.2 \
-    --hash=sha256:0f0ab4717728d33dae8e66deea61eecc1e38f0398e35249e3963ff74cfc8d0d8 \
-    --hash=sha256:75529f9bea08276cea43545dcb6129f137c299d6a12269485a753785c869e0e2
+responses==0.13.3 \
+    --hash=sha256:18a5b88eb24143adbf2b4100f328a2f5bfa72fbdacf12d97d41f07c26c45553d \
+    --hash=sha256:b54067596f331786f5ed094ff21e8d79e6a1c68ef625180a7d34808d6f36c11b
     # via -r requirements-dev.in
 six==1.15.0 \
     --hash=sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259 \

@@ -41,9 +41,9 @@ click==7.1.2 \
     #   click-plugins
     #   click-repl
     #   flask
-elasticsearch==7.12.0 \
-    --hash=sha256:9a77172be02bc4855210d83f0f1346a1e7d421e3cb2ca47ba81ac0c5a717b3a0 \
-    --hash=sha256:c67b0f6541eda6de9f92eaea319c070aa2710c5d4d4ee5e3dfa3c21bd95aa378
+elasticsearch==7.12.1 \
+    --hash=sha256:1840fea8c305224b8c28acabc8697f739cdfb03618f2d2427b42838971a787f6 \
+    --hash=sha256:df35d8c638f946f098a74681b18611bdf27ba469fa2063e3dfc8bdc290b11419
     # via -r requirements.in
 flask-cors==3.0.10 \
     --hash=sha256:74efc975af1194fc7891ff5cd85b0f7478be4f7f59fe158102e91abb72bb4438 \
@@ -110,6 +110,7 @@ greenlet==1.0.0 \
     --hash=sha256:f97d83049715fd9dec7911860ecf0e17b48d8725de01e45de07d8ac0bd5bc378
     # via sqlalchemy
 gunicorn==20.1.0 \
+    --hash=sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e \
     --hash=sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8
     # via -r requirements.in
 itsdangerous==1.1.0 \
