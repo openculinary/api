@@ -270,7 +270,7 @@ class RecipeSearch(QueryRepository):
         * 'duration' mode finds recipes that can be prepared most quickly
 
         In the search index, each recipe contains a list of ingredients.
-        Each ingredient is indentified by the 'ingredient.product.singular'
+        Each ingredient is identified by the 'ingredient.product.singular'
         field.
 
         When users select auto-suggested ingredients, they may be choosing from
