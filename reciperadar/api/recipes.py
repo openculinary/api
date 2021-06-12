@@ -106,6 +106,7 @@ def recipe_explore():
     suspected_bot = ua_parser(user_agent or '').is_bot
 
     # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
+    include = EntityClause.term_list(ingredients, lambda x: x.positive)
     depth = len(ingredients)
     limit = 10 if depth >= 3 else 0
 
@@ -114,7 +115,7 @@ def recipe_explore():
         event_table='searches',
         event_data={
             'suspected_bot': suspected_bot,
-            'include': ingredients,
+            'include': include,
             'exclude': [],
             'equipment': [],
             'offset': 0,
