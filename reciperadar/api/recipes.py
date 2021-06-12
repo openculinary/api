@@ -78,6 +78,7 @@ def recipe_search():
         event_table='searches',
         event_data={
             'suspected_bot': suspected_bot,
+            'path': request.path,
             'include': include,
             'exclude': exclude,
             'equipment': equipment,
@@ -115,6 +116,7 @@ def recipe_explore():
         event_table='searches',
         event_data={
             'suspected_bot': suspected_bot,
+            'path': request.path,
             'include': include,
             'exclude': [],
             'equipment': [],
