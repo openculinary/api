@@ -102,4 +102,27 @@ def recipe_explore():
         dietary_properties=dietary_properties,
     )
 
+    user_agent = request.headers.get('user-agent')
+    suspected_bot = ua_parser(user_agent or '').is_bot
+
+    # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
+    depth = len(ingredients)
+    limit = 10 if depth >= 3 else 0
+
+    # Log a search event
+    store_event.delay(
+        event_table='searches',
+        event_data={
+            'suspected_bot': suspected_bot,
+            'include': ingredients,
+            'exclude': [],
+            'equipment': [],
+            'offset': 0,
+            'limit': limit,
+            'sort': None,
+            'results_ids': [result['id'] for result in results['results']],
+            'results_total': results['total']
+        }
+    )
+
     return jsonify(results)
