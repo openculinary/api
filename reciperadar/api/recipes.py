@@ -108,6 +108,7 @@ def recipe_explore():
 
     # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
     include = EntityClause.term_list(ingredients, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
     depth = len(ingredients)
     limit = 10 if depth >= 3 else 0
 
@@ -118,7 +119,7 @@ def recipe_explore():
             'suspected_bot': suspected_bot,
             'path': request.path,
             'include': include,
-            'exclude': [],
+            'exclude': exclude,
             'equipment': [],
             'offset': 0,
             'limit': limit,
