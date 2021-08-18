@@ -109,7 +109,8 @@ class Recipe(Storable, Searchable):
             ],
             'directions': [
                 # direction.to_dict()
-                # for direction in sorted(self.directions, key=lambda x: x.index)
+                # for direction
+                # in sorted(self.directions, key=lambda x: x.index)
             ],
             'servings': self.servings,
             'rating': self.rating,
