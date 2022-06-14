@@ -228,7 +228,7 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, 'empty_query'
             return
 
-        for exact_match in [True, False]:
+        for exact_match in [False]:
             query, sort_method = self._render_query(
                 ingredients=ingredients,
                 equipment=equipment,
@@ -240,7 +240,7 @@ class RecipeSearch(QueryRepository):
         positive_ingredients = sum([x.positive for x in ingredients])
         if positive_ingredients:
             for min_include_match in range(positive_ingredients, 1, -1):
-                for exact_match in [True, False]:
+                for exact_match in [False]:
                     query, sort_method = self._render_query(
                         ingredients=ingredients,
                         equipment=equipment,
