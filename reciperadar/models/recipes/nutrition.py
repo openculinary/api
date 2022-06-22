@@ -45,7 +45,7 @@ class Nutrition(Storable):
 class IngredientNutrition(Nutrition):
     __tablename__ = 'ingredient_nutrition'
 
-    fk = db.ForeignKey('recipe_ingredients.id', ondelete='cascade')
+    fk = db.ForeignKey('recipe_ingredients.id')
     ingredient_id = db.Column(db.String, fk)
 
     @staticmethod
@@ -69,7 +69,7 @@ class IngredientNutrition(Nutrition):
 class RecipeNutrition(Nutrition):
     __tablename__ = 'recipe_nutrition'
 
-    fk = db.ForeignKey('recipes.id', ondelete='cascade')
+    fk = db.ForeignKey('recipes.id')
     recipe_id = db.Column(db.String, fk)
 
     @staticmethod

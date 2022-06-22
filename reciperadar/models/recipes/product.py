@@ -8,7 +8,7 @@ from reciperadar.search.base import EntityClause
 class Product(Storable):
     __tablename__ = 'ingredient_products'
 
-    ingredient_fk = db.ForeignKey('recipe_ingredients.id', ondelete='cascade')
+    ingredient_fk = db.ForeignKey('recipe_ingredients.id')
     ingredient_id = db.Column(db.String, ingredient_fk)
 
     id = db.Column(db.String, primary_key=True)

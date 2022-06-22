@@ -5,7 +5,7 @@ from reciperadar.models.base import Storable
 class DirectionVessel(Storable):
     __tablename__ = 'direction_vessels'
 
-    fk = db.ForeignKey('recipe_directions.id', ondelete='cascade')
+    fk = db.ForeignKey('recipe_directions.id')
     direction_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
