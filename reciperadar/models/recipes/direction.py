@@ -11,7 +11,7 @@ class RecipeDirection(Storable):
     __tablename__ = 'recipe_directions'
 
     fk = db.ForeignKey('recipes.id', ondelete='cascade')
-    recipe_id = db.Column(db.String, fk, index=True)
+    recipe_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
     index = db.Column(db.Integer)

@@ -6,7 +6,7 @@ class DirectionVessel(Storable):
     __tablename__ = 'direction_vessels'
 
     fk = db.ForeignKey('recipe_directions.id', ondelete='cascade')
-    direction_id = db.Column(db.String, fk, index=True)
+    direction_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
     vessel = db.Column(db.String)

@@ -46,7 +46,7 @@ class IngredientNutrition(Nutrition):
     __tablename__ = 'ingredient_nutrition'
 
     fk = db.ForeignKey('recipe_ingredients.id', ondelete='cascade')
-    ingredient_id = db.Column(db.String, fk, index=True)
+    ingredient_id = db.Column(db.String, fk)
 
     @staticmethod
     def from_doc(doc):
@@ -70,7 +70,7 @@ class RecipeNutrition(Nutrition):
     __tablename__ = 'recipe_nutrition'
 
     fk = db.ForeignKey('recipes.id', ondelete='cascade')
-    recipe_id = db.Column(db.String, fk, index=True)
+    recipe_id = db.Column(db.String, fk)
 
     @staticmethod
     def from_doc(doc):

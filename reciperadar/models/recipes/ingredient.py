@@ -7,11 +7,11 @@ from reciperadar.models.recipes.product import Product
 class RecipeIngredient(Storable):
     __tablename__ = 'recipe_ingredients'
 
-    recipe_fk = db.ForeignKey('recipes.id', ondelete='cascade')
-    recipe_id = db.Column(db.String, recipe_fk, index=True)
+    recipe_fk = db.ForeignKey('recipes.id')
+    recipe_id = db.Column(db.String, recipe_fk)
 
-    product_fk = db.ForeignKey('products.id', deferrable=True)
-    product_id = db.Column(db.String, product_fk, index=True)
+    product_fk = db.ForeignKey('products.id')
+    product_id = db.Column(db.String, product_fk)
 
     id = db.Column(db.String, primary_key=True)
     index = db.Column(db.Integer)

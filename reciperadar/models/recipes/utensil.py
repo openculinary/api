@@ -6,7 +6,7 @@ class DirectionUtensil(Storable):
     __tablename__ = 'direction_utensils'
 
     fk = db.ForeignKey('recipe_directions.id', ondelete='cascade')
-    direction_id = db.Column(db.String, fk, index=True)
+    direction_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
     utensil = db.Column(db.String)

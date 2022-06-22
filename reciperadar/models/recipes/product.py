@@ -9,7 +9,7 @@ class Product(Storable):
     __tablename__ = 'ingredient_products'
 
     ingredient_fk = db.ForeignKey('recipe_ingredients.id', ondelete='cascade')
-    ingredient_id = db.Column(db.String, ingredient_fk, index=True)
+    ingredient_id = db.Column(db.String, ingredient_fk)
 
     id = db.Column(db.String, primary_key=True)
     product_parser = db.Column(db.String)
