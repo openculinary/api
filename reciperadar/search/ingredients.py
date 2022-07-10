@@ -18,7 +18,7 @@ class IngredientSearch(QueryRepository):
                                     "should": [
                                         {
                                             "match": {
-                                                "ingredients.product_name.autocomplete": {
+                                                "ingredients.product_name.autocomplete": {  # noqa
                                                     "query": prefix,
                                                     "operator": "AND",
                                                     "fuzziness": "AUTO",
@@ -42,11 +42,11 @@ class IngredientSearch(QueryRepository):
                                         "size": 10,
                                     },
                                     "aggregations": {
-                                        # count products that were plural in the source recipe
+                                        # count products that were plural in the source recipe  # noqa
                                         "plurality": {
                                             "filter": {
                                                 "match": {
-                                                    "ingredients.product_is_plural": True
+                                                    "ingredients.product_is_plural": True  # noqa
                                                 }
                                             }
                                         },
