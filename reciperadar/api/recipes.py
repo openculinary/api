@@ -9,37 +9,42 @@ from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
 
 
-@app.route('/recipes/<recipe_id>/view')
+@app.route("/recipes/<recipe_id>/view")
 def recipe_view(recipe_id):
     recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
         return abort(404)
 
     results = {
-        'total': 1,
-        'results': [recipe.to_dict()],
+        "total": 1,
+        "results": [recipe.to_dict()],
     }
     return jsonify(results)
 
 
 def dietary_args(args):
-    return [f'is_{arg.replace("-", "_")}' for arg in args if arg in {
-        'dairy-free',
-        'gluten-free',
-        'vegan',
-        'vegetarian',
-    }]
+    return [
+        f'is_{arg.replace("-", "_")}'
+        for arg in args
+        if arg
+        in {
+            "dairy-free",
+            "gluten-free",
+            "vegan",
+            "vegetarian",
+        }
+    ]
 
 
-@app.route('/recipes/search')
+@app.route("/recipes/search")
 def recipe_search():
-    include = EntityClause.from_args(request.args.getlist('include[]'))
-    exclude = EntityClause.from_args(request.args.getlist('exclude[]'))
-    equipment = EntityClause.from_args(request.args.getlist('equipment[]'))
-    offset = min(request.args.get('offset', type=int, default=0), (25*10)-10)
-    limit = min(request.args.get('limit', type=int, default=10), 10)
-    sort = request.args.get('sort', type=str)
-    domains = EntityClause.from_args(request.args.getlist('domains[]'))
+    include = EntityClause.from_args(request.args.getlist("include[]"))
+    exclude = EntityClause.from_args(request.args.getlist("exclude[]"))
+    equipment = EntityClause.from_args(request.args.getlist("equipment[]"))
+    offset = min(request.args.get("offset", type=int, default=0), (25 * 10) - 10)
+    limit = min(request.args.get("limit", type=int, default=10), 10)
+    sort = request.args.get("sort", type=str)
+    domains = EntityClause.from_args(request.args.getlist("domains[]"))
     dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     if sort and sort not in RecipeSearch.sort_methods():
@@ -64,8 +69,8 @@ def recipe_search():
         dietary_properties=dietary_properties,
     )
 
-    user_agent = request.headers.get('user-agent')
-    suspected_bot = ua_parser(user_agent or '').is_bot
+    user_agent = request.headers.get("user-agent")
+    suspected_bot = ua_parser(user_agent or "").is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
     equipment = EntityClause.term_list(equipment)
@@ -75,27 +80,27 @@ def recipe_search():
 
     # Log a search event
     store_event.delay(
-        event_table='searches',
+        event_table="searches",
         event_data={
-            'suspected_bot': suspected_bot,
-            'path': request.path,
-            'include': include,
-            'exclude': exclude,
-            'equipment': equipment,
-            'offset': offset,
-            'limit': limit,
-            'sort': sort,
-            'results_ids': [result['id'] for result in results['results']],
-            'results_total': results['total']
-        }
+            "suspected_bot": suspected_bot,
+            "path": request.path,
+            "include": include,
+            "exclude": exclude,
+            "equipment": equipment,
+            "offset": offset,
+            "limit": limit,
+            "sort": sort,
+            "results_ids": [result["id"] for result in results["results"]],
+            "results_total": results["total"],
+        },
     )
 
     return jsonify(results)
 
 
-@app.route('/recipes/explore')
+@app.route("/recipes/explore")
 def recipe_explore():
-    ingredients = EntityClause.from_args(request.args.getlist('ingredients[]'))
+    ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
     dietary_properties = EntityClause.from_args(dietary_args(request.args))
 
     results = RecipeSearch().explore(
@@ -103,8 +108,8 @@ def recipe_explore():
         dietary_properties=dietary_properties,
     )
 
-    user_agent = request.headers.get('user-agent')
-    suspected_bot = ua_parser(user_agent or '').is_bot
+    user_agent = request.headers.get("user-agent")
+    suspected_bot = ua_parser(user_agent or "").is_bot
 
     # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
     include = EntityClause.term_list(ingredients, lambda x: x.positive)
@@ -114,19 +119,19 @@ def recipe_explore():
 
     # Log a search event
     store_event.delay(
-        event_table='searches',
+        event_table="searches",
         event_data={
-            'suspected_bot': suspected_bot,
-            'path': request.path,
-            'include': include,
-            'exclude': exclude,
-            'equipment': [],
-            'offset': 0,
-            'limit': limit,
-            'sort': None,
-            'results_ids': [result['id'] for result in results['results']],
-            'results_total': results['total']
-        }
+            "suspected_bot": suspected_bot,
+            "path": request.path,
+            "include": include,
+            "exclude": exclude,
+            "equipment": [],
+            "offset": 0,
+            "limit": limit,
+            "sort": None,
+            "results_ids": [result["id"] for result in results["results"]],
+            "results_total": results["total"],
+        },
     )
 
     return jsonify(results)

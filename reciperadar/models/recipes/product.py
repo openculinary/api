@@ -6,9 +6,9 @@ from reciperadar.search.base import EntityClause
 
 
 class Product(Storable):
-    __tablename__ = 'ingredient_products'
+    __tablename__ = "ingredient_products"
 
-    ingredient_fk = db.ForeignKey('recipe_ingredients.id')
+    ingredient_fk = db.ForeignKey("recipe_ingredients.id")
     ingredient_id = db.Column(db.String, ingredient_fk)
 
     id = db.Column(db.String, primary_key=True)
@@ -18,18 +18,18 @@ class Product(Storable):
     category = db.Column(db.String)
     contents = db.Column(postgresql.ARRAY(db.String))
 
-    STATE_AVAILABLE = 'available'
-    STATE_REQUIRED = 'required'
+    STATE_AVAILABLE = "available"
+    STATE_REQUIRED = "required"
 
     @staticmethod
     def from_doc(doc):
         return Product(
-            id=doc.get('id'),
-            product_parser=doc.get('product_parser'),
-            singular=doc.get('singular'),
-            plural=doc.get('plural'),
-            category=doc.get('category'),
-            contents=doc.get('contents'),
+            id=doc.get("id"),
+            product_parser=doc.get("product_parser"),
+            singular=doc.get("singular"),
+            plural=doc.get("plural"),
+            category=doc.get("category"),
+            contents=doc.get("contents"),
         )
 
     def state(self, ingredients):
@@ -44,9 +44,9 @@ class Product(Storable):
 
     def to_dict(self, ingredients):
         return {
-            'id': self.id,
-            'category': self.category,
-            'singular': self.singular,
-            'plural': self.plural,
-            'state': self.state(ingredients),
+            "id": self.id,
+            "category": self.category,
+            "singular": self.singular,
+            "plural": self.plural,
+            "state": self.state(ingredients),
         }

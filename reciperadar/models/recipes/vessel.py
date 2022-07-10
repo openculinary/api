@@ -3,9 +3,9 @@ from reciperadar.models.base import Storable
 
 
 class DirectionVessel(Storable):
-    __tablename__ = 'direction_vessels'
+    __tablename__ = "direction_vessels"
 
-    fk = db.ForeignKey('recipe_directions.id')
+    fk = db.ForeignKey("recipe_directions.id")
     direction_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
@@ -13,8 +13,8 @@ class DirectionVessel(Storable):
 
     @staticmethod
     def from_doc(doc):
-        vessel_id = doc.get('id') or DirectionVessel.generate_id()
+        vessel_id = doc.get("id") or DirectionVessel.generate_id()
         return DirectionVessel(
             id=vessel_id,
-            vessel=doc['vessel'],
+            vessel=doc["vessel"],
         )

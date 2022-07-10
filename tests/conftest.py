@@ -26,7 +26,7 @@ def raw_recipe_hit():
                         "<mark class='action'>place</mark> each "
                         "<mark class='equipment utensil'>skewer</mark> in the "
                         "<mark class='equipment appliance'>oven</mark>"
-                    )
+                    ),
                 }
             ],
             "ingredients": [
@@ -54,18 +54,16 @@ def raw_recipe_hit():
                         "fibre": 0.65,
                         "fibre_units": "g",
                         "protein": 0.05,
-                        "protein_units": "g"
-                    }
+                        "protein_units": "g",
+                    },
                 },
                 {
                     "index": 1,
                     "description": "two units of test ingredient two",
-                    "product": {
-                        "singular": "two"
-                    },
+                    "product": {"singular": "two"},
                     "product_is_plural": False,
-                    "product_name": "two"
-                }
+                    "product_name": "two",
+                },
             ],
             "author": "example",
             "image_src": "http://www.example.com/path/image.png?v=123",
@@ -85,9 +83,9 @@ def raw_recipe_hit():
                 "fibre": 0.65,
                 "fibre_units": "g",
                 "protein": 0.05,
-                "protein_units": "g"
+                "protein_units": "g",
             },
-            "is_vegetarian": True
+            "is_vegetarian": True,
         },
-        "inner_hits": {"ingredients": {"hits": {"hits": []}}}
+        "inner_hits": {"ingredients": {"hits": {"hits": []}}},
     }

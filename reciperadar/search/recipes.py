@@ -5,59 +5,61 @@ from reciperadar.search.base import EntityClause, QueryRepository
 
 
 class RecipeSearch(QueryRepository):
-
     @staticmethod
     def _generate_include_clause(ingredients):
         include = EntityClause.term_list(ingredients, lambda x: x.positive)
-        return [{
-            'constant_score': {
-                'boost': pow(10, idx),
-                'filter': {
-                    'match': {'contents': inc}
+        return [
+            {
+                "constant_score": {
+                    "boost": pow(10, idx),
+                    "filter": {"match": {"contents": inc}},
                 }
             }
-        } for idx, inc in enumerate(reversed(include))]
+            for idx, inc in enumerate(reversed(include))
+        ]
 
     @staticmethod
     def _generate_include_exact_clause(ingredients):
         include = EntityClause.term_list(ingredients, lambda x: x.positive)
-        return [{
-            'nested': {
-                'path': 'ingredients',
-                'query': {
-                    'constant_score': {
-                        'boost': pow(10, idx) * 2,
-                        'filter': {
-                            'match': {'ingredients.product.singular': inc}
+        return [
+            {
+                "nested": {
+                    "path": "ingredients",
+                    "query": {
+                        "constant_score": {
+                            "boost": pow(10, idx) * 2,
+                            "filter": {"match": {"ingredients.product.singular": inc}},
                         }
-                    }
+                    },
                 }
             }
-        } for idx, inc in enumerate(reversed(include))]
+            for idx, inc in enumerate(reversed(include))
+        ]
 
     @staticmethod
     def _generate_exclude_clause(ingredients):
         return [
             # exclude 'hidden' recipes
-            {'match': {'hidden': True}},
+            {"match": {"hidden": True}},
         ] + [
             # match any ingredients in the exclude list
-            {'match': {'contents': ingredient.term}}
-            for ingredient in ingredients if not ingredient.positive
+            {"match": {"contents": ingredient.term}}
+            for ingredient in ingredients
+            if not ingredient.positive
         ]
 
     @staticmethod
     def _generate_equipment_clause(equipment):
         conditions = defaultdict(list)
         for item in equipment:
-            condition = 'filter' if item.positive else 'must_not'
-            match = {'match': {'directions.equipment.name': item.term}}
+            condition = "filter" if item.positive else "must_not"
+            match = {"match": {"directions.equipment.name": item.term}}
             conditions[condition].append(match)
-        return {'bool': conditions}
+        return {"bool": conditions}
 
     @staticmethod
     def sort_methods():
-        preamble = '''
+        preamble = """
             def product_count = doc.product_count.value;
             def exact_found_count = 0;
             def found_count = 0;
@@ -72,73 +74,67 @@ class RecipeSearch(QueryRepository):
             def normalized_rating = doc.rating.value / 10;
             def missing_score = (exact_missing_count * 2 - missing_count);
             def missing_ratio = missing_count / product_count;
-        '''
+        """
         return {
             # rank: number of ingredient matches
             # tiebreak: recipe rating
-            'relevance': {
-                'script': f'{preamble} relevance_score + normalized_rating',
-                'order': 'desc'
+            "relevance": {
+                "script": f"{preamble} relevance_score + normalized_rating",
+                "order": "desc",
             },
-
             # rank: number of missing ingredients
             # tiebreak: recipe rating
-            'ingredients': {
-                'script': f'{preamble} missing_score + 1 - normalized_rating',
-                'order': 'asc'
+            "ingredients": {
+                "script": f"{preamble} missing_score + 1 - normalized_rating",
+                "order": "asc",
             },
-
             # rank: preparation time
             # tiebreak: percentage of missing ingredients
-            'duration': {
-                'script': f'{preamble} doc.time.value + missing_ratio',
-                'order': 'asc'
+            "duration": {
+                "script": f"{preamble} doc.time.value + missing_ratio",
+                "order": "asc",
             },
         }
 
     def _generate_sort_method(self, ingredients, sort):
         # set the default sort method
         if not sort:
-            sort = 'relevance'
+            sort = "relevance"
         # if no ingredients are specified, we may be able to short-cut sorting
-        if not any([x.positive for x in ingredients]) and sort != 'duration':
-            return {'script': 'doc.rating.value', 'order': 'desc'}
+        if not any([x.positive for x in ingredients]) and sort != "duration":
+            return {"script": "doc.rating.value", "order": "desc"}
         return self.sort_methods()[sort]
 
     def _domain_facets(self):
-        return {
-            'domains': {
-                'terms': {'field': 'domain', 'size': 100}
-            }
-        }
+        return {"domains": {"terms": {"field": "domain", "size": 100}}}
 
     def _product_filter(self, ingredients, dietary_properties):
         conditions = defaultdict(list)
 
         # Do not present staple ingredients as choices
-        match = {'term': {'ingredients.product.is_kitchen_staple': True}}
-        conditions['must_not'].append(match)
+        match = {"term": {"ingredients.product.is_kitchen_staple": True}}
+        conditions["must_not"].append(match)
 
         # Do not present already-selected ingredients as choices
         for ingredient in ingredients:
-            match = {'term': {'ingredients.product.singular': ingredient.term}}
-            conditions['must_not'].append(match)
+            match = {"term": {"ingredients.product.singular": ingredient.term}}
+            conditions["must_not"].append(match)
 
         # Filter to products that satisfy the user's dietary requirements
         for dietary_property in dietary_properties:
-            field = f'ingredients.product.{dietary_property.term}'
-            match = {'term': {field: True}}
-            conditions['filter'].append(match)
+            field = f"ingredients.product.{dietary_property.term}"
+            match = {"term": {field: True}}
+            conditions["filter"].append(match)
 
-        return {'bool': conditions}
+        return {"bool": conditions}
 
     def _product_aggregatation(self):
         return {
-            'singular': {
-                'terms': {
-                    'field': 'ingredients.product.singular',
-                    'order': {'_count': 'desc'},
-                    'size': 50
+            "singular": {
+                "terms": {
+                    "field": "ingredients.product.singular",
+                    "order": {"_count": "desc"},
+                    "size": 50,
                 }
             }
         }
@@ -147,46 +143,47 @@ class RecipeSearch(QueryRepository):
         product_filter = self._product_filter(ingredients, dietary_properties)
         product_aggregation = self._product_aggregatation()
         return {
-            'products': {
-                'nested': {'path': 'ingredients'},
-                'aggs': {
-                    'choices': {
-                        'filter': product_filter,
-                        'aggs': product_aggregation,
+            "products": {
+                "nested": {"path": "ingredients"},
+                "aggs": {
+                    "choices": {
+                        "filter": product_filter,
+                        "aggs": product_aggregation,
                     }
-                }
+                },
             }
         }
 
-    def _generate_aggregations(self, suggest_products, ingredients,
-                               dietary_properties):
+    def _generate_aggregations(self, suggest_products, ingredients, dietary_properties):
         aggregations = {
             **self._domain_facets(),
             **(
                 self._product_suggestions(ingredients, dietary_properties)
-                if suggest_products else {}
-            )
+                if suggest_products
+                else {}
+            ),
         }
         return {
-            'prefilter': {
-                'filter': {'match_all': {}},
-                'aggs': aggregations,
+            "prefilter": {
+                "filter": {"match_all": {}},
+                "aggs": aggregations,
             }
         }
 
     def _generate_post_filter(self, domains, dietary_properties):
         conditions = defaultdict(list)
         for domain in domains:
-            condition = 'filter' if domain.positive else 'must_not'
-            match = {'match': {'domain': domain.term}}
+            condition = "filter" if domain.positive else "must_not"
+            match = {"match": {"domain": domain.term}}
             conditions[condition].append(match)
         for dietary_property in dietary_properties:
-            match = {'match': {dietary_property.term: True}}
-            conditions['filter'].append(match)
-        return {'bool': conditions}
+            match = {"match": {dietary_property.term: True}}
+            conditions["filter"].append(match)
+        return {"bool": conditions}
 
-    def _render_query(self, ingredients, equipment, sort, exact_match=True,
-                      min_include_match=None):
+    def _render_query(
+        self, ingredients, equipment, sort, exact_match=True, min_include_match=None
+    ):
         include_exact_clause = self._generate_include_exact_clause(ingredients)
         include_clause = self._generate_include_clause(ingredients)
         exclude_clause = self._generate_exclude_clause(ingredients)
@@ -196,36 +193,34 @@ class RecipeSearch(QueryRepository):
         should = include_exact_clause if exact_match else include_clause
         must_not = exclude_clause
         filter = [equipment_clause] + [
-            {'range': {'time': {'gte': 5}}},
-            {'range': {'product_count': {'gt': 0}}},
+            {"range": {"time": {"gte": 5}}},
+            {"range": {"product_count": {"gt": 0}}},
         ]
         if min_include_match is None:
             min_include_match = len(should)
 
         return {
-            'function_score': {
-                'boost_mode': 'replace',
-                'query': {
-                    'bool': {
-                        'should': should,
-                        'must_not': must_not,
-                        'filter': filter,
-                        'minimum_should_match': min_include_match,
+            "function_score": {
+                "boost_mode": "replace",
+                "query": {
+                    "bool": {
+                        "should": should,
+                        "must_not": must_not,
+                        "filter": filter,
+                        "minimum_should_match": min_include_match,
                     }
                 },
-                'script_score': {'script': {'source': sort_params['script']}}
+                "script_score": {"script": {"source": sort_params["script"]}},
             }
-        }, [{'_score': sort_params['order']}]
+        }, [{"_score": sort_params["order"]}]
 
     def _refined_queries(self, ingredients, equipment, sort):
         # Provide an 'empty query' hint
         if not any([ingredients, equipment, sort]):
             query, sort_method = self._render_query(
-                ingredients=ingredients,
-                equipment=equipment,
-                sort=sort
+                ingredients=ingredients, equipment=equipment, sort=sort
             )
-            yield query, sort_method, 'empty_query'
+            yield query, sort_method, "empty_query"
             return
 
         for exact_match in [False]:
@@ -233,7 +228,7 @@ class RecipeSearch(QueryRepository):
                 ingredients=ingredients,
                 equipment=equipment,
                 exact_match=exact_match,
-                sort=sort
+                sort=sort,
             )
             yield query, sort_method, None
 
@@ -246,22 +241,31 @@ class RecipeSearch(QueryRepository):
                         equipment=equipment,
                         sort=sort,
                         exact_match=exact_match,
-                        min_include_match=min_include_match
+                        min_include_match=min_include_match,
                     )
-                    yield query, sort_method, 'partial'
+                    yield query, sort_method, "partial"
 
             query, sort_method = self._render_query(
                 ingredients=ingredients,
                 equipment=equipment,
                 sort=sort,
                 exact_match=False,
-                min_include_match=1 if positive_ingredients else 0
+                min_include_match=1 if positive_ingredients else 0,
             )
-            yield query, sort_method, 'match_any'
+            yield query, sort_method, "match_any"
 
-    def query(self, ingredients, equipment, offset, limit, sort, domains,
-              dietary_properties, allow_refinement=True,
-              suggest_products=False):
+    def query(
+        self,
+        ingredients,
+        equipment,
+        offset,
+        limit,
+        sort,
+        domains,
+        dietary_properties,
+        allow_refinement=True,
+        suggest_products=False,
+    ):
         """
         Searching for recipes is currently supported in three different modes:
 
@@ -385,68 +389,65 @@ class RecipeSearch(QueryRepository):
         aggregations = self._generate_aggregations(
             suggest_products=suggest_products,
             ingredients=ingredients,
-            dietary_properties=dietary_properties
+            dietary_properties=dietary_properties,
         )
         post_filter = self._generate_post_filter(
-            domains=domains,
-            dietary_properties=dietary_properties
+            domains=domains, dietary_properties=dietary_properties
         )
 
         queries = self._refined_queries(
-            ingredients=ingredients,
-            equipment=equipment,
-            sort=sort
+            ingredients=ingredients, equipment=equipment, sort=sort
         )
         for query, sort_method, refinement in queries:
             results = self.es.search(
-                index='recipes',
+                index="recipes",
                 body={
-                    'from': offset,
-                    'size': limit,
-                    'query': query,
-                    'sort': sort_method,
-                    'aggs': aggregations,
-                    'post_filter': post_filter,
-                }
+                    "from": offset,
+                    "size": limit,
+                    "query": query,
+                    "sort": sort_method,
+                    "aggs": aggregations,
+                    "post_filter": post_filter,
+                },
             )
             if not allow_refinement:
                 break
-            if results['aggregations']['prefilter']['doc_count'] >= 5:
+            if results["aggregations"]["prefilter"]["doc_count"] >= 5:
                 break
 
         recipes = []
-        for result in results['hits']['hits']:
-            recipe = Recipe.from_doc(result['_source'])
+        for result in results["hits"]["hits"]:
+            recipe = Recipe.from_doc(result["_source"])
             recipes.append(recipe.to_dict(ingredients))
 
         # TODO: Can this bucket sorting be moved into the aggregation pipeline?
         if suggest_products:
-            prefilter = results['aggregations']['prefilter']
-            total = prefilter['doc_count']
+            prefilter = results["aggregations"]["prefilter"]
+            total = prefilter["doc_count"]
 
-            products = prefilter['products']['choices']['singular']['buckets']
-            products = [x for x in products if x['doc_count'] != total]
-            products.sort(key=lambda x: abs(x['doc_count'] - (total / 2)))
-            prefilter['products'] = {'buckets': products[:10]}
+            products = prefilter["products"]["choices"]["singular"]["buckets"]
+            products = [x for x in products if x["doc_count"] != total]
+            products.sort(key=lambda x: abs(x["doc_count"] - (total / 2)))
+            prefilter["products"] = {"buckets": products[:10]}
 
         facets = {}
-        for field, content in results['aggregations']['prefilter'].items():
-            if not isinstance(content, dict) or 'buckets' not in content:
+        for field, content in results["aggregations"]["prefilter"].items():
+            if not isinstance(content, dict) or "buckets" not in content:
                 continue
             facets[field] = [
                 {
-                    'key': bucket['key'],
-                    'count': min(bucket['doc_count'], 100),
+                    "key": bucket["key"],
+                    "count": min(bucket["doc_count"], 100),
                 }
-                for bucket in content['buckets']
+                for bucket in content["buckets"]
             ]
 
         return {
-            'authority': 'api',
-            'total': min(results['hits']['total']['value'], 25 * limit),
-            'results': recipes,
-            'facets': facets,
-            'refinements': [refinement] if recipes and refinement else []
+            "authority": "api",
+            "total": min(results["hits"]["total"]["value"], 25 * limit),
+            "results": recipes,
+            "facets": facets,
+            "refinements": [refinement] if recipes and refinement else [],
         }
 
     def explore(self, ingredients, dietary_properties):
@@ -461,5 +462,5 @@ class RecipeSearch(QueryRepository):
             domains=[],
             dietary_properties=dietary_properties,
             allow_refinement=False,
-            suggest_products=True
+            suggest_products=True,
         )

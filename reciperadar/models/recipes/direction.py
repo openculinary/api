@@ -8,32 +8,23 @@ from reciperadar.models.recipes.vessel import DirectionVessel
 
 
 class RecipeDirection(Storable):
-    __tablename__ = 'recipe_directions'
+    __tablename__ = "recipe_directions"
 
-    fk = db.ForeignKey('recipes.id')
+    fk = db.ForeignKey("recipes.id")
     recipe_id = db.Column(db.String, fk)
 
     id = db.Column(db.String, primary_key=True)
     index = db.Column(db.Integer)
     description = db.Column(db.String)
     markup = db.Column(db.String)
-    appliances = db.relationship(
-        'DirectionAppliance',
-        passive_deletes='all'
-    )
-    utensils = db.relationship(
-        'DirectionUtensil',
-        passive_deletes='all'
-    )
-    vessels = db.relationship(
-        'DirectionVessel',
-        passive_deletes='all'
-    )
+    appliances = db.relationship("DirectionAppliance", passive_deletes="all")
+    utensils = db.relationship("DirectionUtensil", passive_deletes="all")
+    vessels = db.relationship("DirectionVessel", passive_deletes="all")
 
     @staticmethod
     def _build_item(item, category, category_class):
-        item_classes = set(item.attrib.get('class', '').split())
-        if 'equipment' not in item_classes:
+        item_classes = set(item.attrib.get("class", "").split())
+        if "equipment" not in item_classes:
             return
         if category not in item_classes:
             return
@@ -43,21 +34,21 @@ class RecipeDirection(Storable):
     @staticmethod
     def _parse_equipment(markup):
         equipment = {
-            'appliances': [],
-            'utensils': [],
-            'vessels': [],
+            "appliances": [],
+            "utensils": [],
+            "vessels": [],
         }
         if not markup:
             return equipment
 
         category_classes = {
-            'appliances': DirectionAppliance,
-            'utensils': DirectionUtensil,
-            'vessels': DirectionVessel,
+            "appliances": DirectionAppliance,
+            "utensils": DirectionUtensil,
+            "vessels": DirectionVessel,
         }
 
-        doc = ElementTree.fromstring(f'<xml>{markup}</xml>')
-        for item in doc.findall('mark'):
+        doc = ElementTree.fromstring(f"<xml>{markup}</xml>")
+        for item in doc.findall("mark"):
             for category in equipment:
                 cls = category_classes[category]
                 obj = RecipeDirection._build_item(item, category[:-1], cls)
@@ -66,17 +57,17 @@ class RecipeDirection(Storable):
 
     @staticmethod
     def from_doc(doc, matches=None):
-        direction_id = doc.get('id') or RecipeDirection.generate_id()
-        equipment = RecipeDirection._parse_equipment(doc['markup'])
+        direction_id = doc.get("id") or RecipeDirection.generate_id()
+        equipment = RecipeDirection._parse_equipment(doc["markup"])
         return RecipeDirection(
             id=direction_id,
-            index=doc['index'],
-            description=doc['description'],
-            markup=doc['markup'],
-            **equipment
+            index=doc["index"],
+            description=doc["description"],
+            markup=doc["markup"],
+            **equipment,
         )
 
     def to_dict(self):
         return {
-            'markup': self.markup,
+            "markup": self.markup,
         }

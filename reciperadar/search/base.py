@@ -4,14 +4,13 @@ from elasticsearch import Elasticsearch
 
 
 class EntityClause(object):
-
     def __init__(self, term, positive):
         self.term = term
         self.positive = positive
 
     @staticmethod
     def from_arg(arg):
-        return EntityClause(arg.lstrip('-'), positive=not arg.startswith('-'))
+        return EntityClause(arg.lstrip("-"), positive=not arg.startswith("-"))
 
     @staticmethod
     def from_args(args):
@@ -25,4 +24,4 @@ class EntityClause(object):
 class QueryRepository(object):
     __metaclass__ = ABC
 
-    es = Elasticsearch('elasticsearch')
+    es = Elasticsearch("elasticsearch")
