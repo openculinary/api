@@ -117,9 +117,6 @@ class IngredientSearch(QueryRepository):
                 "category": suggestion.category,
                 "singular": suggestion.singular,
                 "plural": suggestion.plural,
-                # TODO: these fields are provided for backwards-compatibility
-                "product_id": suggestion.id,
-                "product": suggestion.name,
             }
             for suggestion in suggestions
         ]

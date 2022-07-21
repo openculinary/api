@@ -66,11 +66,6 @@ class RecipeIngredient(Storable):
                 **self.product.to_dict(ingredients),
                 # TODO: would a 'countable' flag on products be preferable?
                 **{"name": self.product_name},
-                # TODO: these fields are provided for backwards-compatibility
-                **{
-                    "product_id": self.product.id,
-                    "product": self.product_name,
-                },
             },
             "quantity": {
                 "magnitude": self.magnitude,
