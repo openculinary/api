@@ -16,10 +16,11 @@ def raw_recipe_hit():
         "_id": "random-id",
         "_score": 10.04635,
         "_source": {
-            "id": "example_id",
+            "id": "recipe_id_0",
             "title": "Test Recipe",
             "directions": [
                 {
+                    "id": "direction_id_0",
                     "index": 0,
                     "description": "place each skewer in the oven",
                     "markup": (
@@ -27,10 +28,23 @@ def raw_recipe_hit():
                         "<mark class='equipment utensil'>skewer</mark> in the "
                         "<mark class='equipment appliance'>oven</mark>"
                     ),
+                    "equipment": [
+                        {
+                            "id": "equipment_id_0",
+                            "name": "skewer",
+                            "category": "utensil",
+                        },
+                        {
+                            "id": "equipment_id_1",
+                            "name": "oven",
+                            "category": "appliance",
+                        },
+                    ],
                 }
             ],
             "ingredients": [
                 {
+                    "id": "ingredient_id_0",
                     "index": 0,
                     "description": "1 unit of test ingredient one",
                     "product": {
@@ -45,6 +59,7 @@ def raw_recipe_hit():
                     "product_is_plural": False,
                     "product_name": "one",
                     "nutrition": {
+                        "id": "nutrition_id_0",
                         "carbohydrates": 0,
                         "carbohydrates_units": "g",
                         "energy": 0,
@@ -58,6 +73,7 @@ def raw_recipe_hit():
                     },
                 },
                 {
+                    "id": "ingredient_id_1",
                     "index": 1,
                     "description": "two units of test ingredient two",
                     "product": {"singular": "two"},
