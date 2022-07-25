@@ -50,9 +50,8 @@ class IngredientNutrition(Nutrition):
 
     @staticmethod
     def from_doc(doc):
-        nutrition_id = doc.get("id") or IngredientNutrition.generate_id()
         return IngredientNutrition(
-            id=nutrition_id,
+            id=doc["id"],
             carbohydrates=doc.get("carbohydrates"),
             carbohydrates_units=doc.get("carbohydrates_units"),
             energy=doc.get("energy"),
@@ -74,9 +73,7 @@ class RecipeNutrition(Nutrition):
 
     @staticmethod
     def from_doc(doc):
-        nutrition_id = doc.get("id") or RecipeNutrition.generate_id()
         return RecipeNutrition(
-            id=nutrition_id,
             carbohydrates=doc.get("carbohydrates"),
             carbohydrates_units=doc.get("carbohydrates_units"),
             energy=doc.get("energy"),

@@ -13,8 +13,7 @@ class DirectionVessel(DirectionEquipment):
 
     @staticmethod
     def from_doc(doc):
-        vessel_id = doc.get("id") or DirectionVessel.generate_id()
         return DirectionVessel(
-            id=vessel_id,
+            id=doc["id"],
             vessel=doc["name"],
         )

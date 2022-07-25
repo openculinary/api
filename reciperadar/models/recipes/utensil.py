@@ -13,8 +13,7 @@ class DirectionUtensil(DirectionEquipment):
 
     @staticmethod
     def from_doc(doc):
-        utensil_id = doc.get("id") or DirectionUtensil.generate_id()
         return DirectionUtensil(
-            id=utensil_id,
+            id=doc["id"],
             utensil=doc["name"],
         )
