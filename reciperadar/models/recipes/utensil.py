@@ -1,8 +1,8 @@
 from reciperadar import db
-from reciperadar.models.base import Storable
+from reciperadar.models.recipes.equipment import DirectionEquipment
 
 
-class DirectionUtensil(Storable):
+class DirectionUtensil(DirectionEquipment):
     __tablename__ = "direction_utensils"
 
     fk = db.ForeignKey("recipe_directions.id")
@@ -16,5 +16,5 @@ class DirectionUtensil(Storable):
         utensil_id = doc.get("id") or DirectionUtensil.generate_id()
         return DirectionUtensil(
             id=utensil_id,
-            utensil=doc["utensil"],
+            utensil=doc["name"],
         )
