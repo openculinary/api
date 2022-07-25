@@ -13,8 +13,7 @@ class DirectionAppliance(DirectionEquipment):
 
     @staticmethod
     def from_doc(doc):
-        appliance_id = doc.get("id") or DirectionAppliance.generate_id()
         return DirectionAppliance(
-            id=appliance_id,
+            id=doc["id"],
             appliance=doc["name"],
         )

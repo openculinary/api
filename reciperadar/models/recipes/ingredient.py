@@ -40,10 +40,9 @@ class RecipeIngredient(Storable):
 
     @staticmethod
     def from_doc(doc):
-        ingredient_id = doc.get("id") or RecipeIngredient.generate_id()
         nutrition = doc.get("nutrition")
         return RecipeIngredient(
-            id=ingredient_id,
+            id=doc["id"],
             index=doc["index"],
             description=doc["description"].strip(),
             markup=doc.get("markup"),

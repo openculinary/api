@@ -22,12 +22,11 @@ class RecipeDirection(Storable):
 
     @staticmethod
     def from_doc(doc, matches=None):
-        direction_id = doc.get("id") or RecipeDirection.generate_id()
         equipment = [
             DirectionEquipment.from_doc(equipment) for equipment in doc["equipment"]
         ]
         return RecipeDirection(
-            id=direction_id,
+            id=doc["id"],
             index=doc["index"],
             description=doc["description"],
             markup=doc["markup"],
