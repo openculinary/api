@@ -1,3 +1,4 @@
+basest==0.7.3
 celery==5.2.7
 elasticsearch<7.14.0
 flask==2.1.3

@@ -2,6 +2,10 @@ amqp==5.1.1 \
     --hash=sha256:2c1b13fecc0893e946c65cbd5f36427861cffa4ea2201d8f6fca22e2a373b5e2 \
     --hash=sha256:6f0956d2c23d8fa6e7691934d8c3930eadb44972cbbd1a7ae3a520f735d43359
     # via kombu
+basest==0.7.3 \
+    --hash=sha256:57468bcff59306dde1943fb3e3839aafd8f9e11ad29909e4768b93e8bdf213a9 \
+    --hash=sha256:77449eaa031182a205c69811d341830a16a9d9e258e10fd5504b89b23ad8066f
+    # via -r requirements.in
 billiard==3.6.4.0 \
     --hash=sha256:299de5a8da28a783d51b197d496bef4f1595dd023a93a4f59dde1886ae905547 \
     --hash=sha256:87103ea78fa6ab4d5c751c4909bcff74617d985de7fa8b672cf8618afd5a875b
