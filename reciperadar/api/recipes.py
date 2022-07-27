@@ -41,13 +41,18 @@ def dietary_args(args):
 
 @app.before_first_request
 def load_ingredient_synonyms():
+    # Return cached synonyms if they are available and have not yet expired
     if hasattr(app, "ingredient_synonyms"):
         if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
             return app.ingredient_synonyms
+
+    # Attempt to update the synonym cache
     synonyms = IngredientSearch().synonyms()
     if synonyms:
         app.ingredient_synonyms = synonyms
         app.ingredient_synonyms_loaded_at = datetime.utcnow()
+
+    # Return the latest-known synonyms
     return app.ingredient_synonyms
 
 
