@@ -1,9 +1,12 @@
+from datetime import datetime, timedelta
+
 from flask import abort, jsonify, request
 from user_agents import parse as ua_parser
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import EntityClause
+from reciperadar.search.ingredients import IngredientSearch
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
@@ -34,6 +37,16 @@ def dietary_args(args):
             "vegetarian",
         }
     ]
+
+
+@app.before_first_request
+def load_ingredient_synonyms():
+    if hasattr(app, "ingredient_synonyms"):
+        if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
+            return app.ingredient_synonyms
+    app.ingredient_synonyms = IngredientSearch().synonyms()
+    app.ingredient_synonyms_loaded_at = datetime.utcnow()
+    return app.ingredient_synonyms
 
 
 @app.route("/recipes/search")
@@ -73,9 +86,10 @@ def recipe_search():
     suspected_bot = ua_parser(user_agent or "").is_bot
 
     # Perform a recrawl for the search to find any new/missing recipes
+    synonyms = load_ingredient_synonyms()
     equipment = EntityClause.term_list(equipment)
-    include = EntityClause.term_list(ingredients, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
+    include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, synonyms, lambda x: not x.positive)
     recrawl_search.delay(include, exclude, equipment, offset)
 
     # Log a search event
@@ -112,8 +126,9 @@ def recipe_explore():
     suspected_bot = ua_parser(user_agent or "").is_bot
 
     # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
-    include = EntityClause.term_list(ingredients, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
+    synonyms = load_ingredient_synonyms()
+    include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, synonyms, lambda x: not x.positive)
     depth = len(ingredients)
     limit = 10 if depth >= 3 else 0
 
