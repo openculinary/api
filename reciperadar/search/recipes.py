@@ -7,7 +7,7 @@ from reciperadar.search.base import EntityClause, QueryRepository
 class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_include_clause(ingredients):
-        include = EntityClause.term_list(ingredients, lambda x: x.positive)
+        include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
         return [
             {
                 "constant_score": {
@@ -20,7 +20,7 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_include_exact_clause(ingredients):
-        include = EntityClause.term_list(ingredients, lambda x: x.positive)
+        include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
         return [
             {
                 "nested": {
