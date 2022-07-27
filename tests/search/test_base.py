@@ -13,3 +13,14 @@ def test_entity_clause_parsing():
     actual_results = [(clause.term, clause.positive) for clause in clauses]
 
     assert expected_results == actual_results
+
+
+def test_entity_clause_term_list_expansion():
+    args = ["coriander", "basil"]
+    clauses = EntityClause.from_args(args)
+    synonyms = {"coriander": ["cilantro", "coriander"]}
+
+    expected_results = ["basil", "cilantro", "coriander"]
+    actual_results = EntityClause.term_list(clauses, synonyms=synonyms)
+
+    assert set(expected_results) == set(actual_results)

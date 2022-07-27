@@ -8,6 +8,10 @@ class EntityClause(object):
         self.term = term
         self.positive = positive
 
+    @property
+    def negative(self):
+        return not self.positive
+
     @staticmethod
     def from_arg(arg):
         return EntityClause(arg.lstrip("-"), positive=not arg.startswith("-"))
@@ -17,8 +21,13 @@ class EntityClause(object):
         return [EntityClause.from_arg(arg) for arg in args]
 
     @staticmethod
-    def term_list(clauses, condition=lambda x: True):
-        return list(set(map(lambda x: x.term, filter(condition, clauses))))
+    def term_list(clauses, synonyms=None, condition=lambda x: True):
+        synonyms = synonyms or {}
+        terms = set()
+        for clause in filter(condition, clauses):
+            for expansion in synonyms.get(clause.term) or [clause.term]:
+                terms.add(expansion)
+        return list(terms)
 
 
 class QueryRepository(object):

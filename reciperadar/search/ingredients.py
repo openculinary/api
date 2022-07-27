@@ -120,3 +120,13 @@ class IngredientSearch(QueryRepository):
             }
             for suggestion in suggestions
         ]
+
+    def synonyms(self):
+        try:
+            results = self.es.search(index="product_synonyms", size=10000)
+        except Exception:
+            return None
+        return {
+            result["_id"]: result["_source"]["synonyms"]
+            for result in results["hits"]["hits"]
+        }

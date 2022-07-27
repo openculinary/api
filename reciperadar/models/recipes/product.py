@@ -38,7 +38,7 @@ class Product(Storable):
             True: Product.STATE_AVAILABLE,
             False: Product.STATE_REQUIRED,
         }
-        include = EntityClause.term_list(ingredients, lambda x: x.positive)
+        include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
         available = bool(set(self.contents or []) & set(include))
         return states[available]
 

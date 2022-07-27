@@ -74,8 +74,8 @@ def recipe_search():
 
     # Perform a recrawl for the search to find any new/missing recipes
     equipment = EntityClause.term_list(equipment)
-    include = EntityClause.term_list(ingredients, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
+    include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
     recrawl_search.delay(include, exclude, equipment, offset)
 
     # Log a search event
@@ -112,8 +112,8 @@ def recipe_explore():
     suspected_bot = ua_parser(user_agent or "").is_bot
 
     # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
-    include = EntityClause.term_list(ingredients, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, lambda x: not x.positive)
+    include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
     depth = len(ingredients)
     limit = 10 if depth >= 3 else 0
 
