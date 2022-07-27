@@ -9,7 +9,7 @@ class Feedback(object):
         from reciperadar import app, mail
 
         with app.app_context():
-            issue = issue.pop("issue") or "(empty)"
+            title = issue.pop("issue") or "(empty)"
             title = issue if len(issue) < 25 else f"{issue[:25]}..."
 
             html = "<html><body><table>"
