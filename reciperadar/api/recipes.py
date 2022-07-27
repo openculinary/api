@@ -53,7 +53,8 @@ def load_ingredient_synonyms():
         app.ingredient_synonyms_loaded_at = datetime.utcnow()
 
     # Return the latest-known synonyms
-    return app.ingredient_synonyms
+    if hasattr(app, "ingredient_synonyms"):
+        return app.ingredient_synonyms
 
 
 @app.route("/recipes/search")
