@@ -8,6 +8,10 @@ class EntityClause(object):
         self.term = term
         self.positive = positive
 
+    @property
+    def negative(self):
+        return not self.positive
+
     @staticmethod
     def from_arg(arg):
         return EntityClause(arg.lstrip("-"), positive=not arg.startswith("-"))

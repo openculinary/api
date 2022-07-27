@@ -1,13 +1,35 @@
 from collections import defaultdict
+from datetime import datetime, timedelta
 
+from reciperadar import app
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import EntityClause, QueryRepository
+from reciperadar.search.ingredients import IngredientSearch
+
+
+@app.before_first_request
+def load_ingredient_synonyms():
+    # Return cached synonyms if they are available and have not yet expired
+    if hasattr(app, "ingredient_synonyms"):
+        if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
+            return app.ingredient_synonyms
+
+    # Attempt to update the synonym cache
+    synonyms = IngredientSearch().synonyms()
+    if synonyms:
+        app.ingredient_synonyms = synonyms
+        app.ingredient_synonyms_loaded_at = datetime.utcnow()
+
+    # Return the latest-known synonyms
+    if hasattr(app, "ingredient_synonyms"):
+        return app.ingredient_synonyms
 
 
 class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_include_clause(ingredients):
-        include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
+        synonyms = load_ingredient_synonyms()
+        include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
         return [
             {
                 "constant_score": {
@@ -20,7 +42,8 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_include_exact_clause(ingredients):
-        include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
+        synonyms = load_ingredient_synonyms()
+        include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
         return [
             {
                 "nested": {
@@ -38,14 +61,15 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def _generate_exclude_clause(ingredients):
+        synonyms = load_ingredient_synonyms()
+        exclude = EntityClause.term_list(ingredients, synonyms, lambda x: x.negative)
         return [
             # exclude 'hidden' recipes
             {"match": {"hidden": True}},
         ] + [
             # match any ingredients in the exclude list
-            {"match": {"contents": ingredient.term}}
-            for ingredient in ingredients
-            if not ingredient.positive
+            {"match": {"contents": exc}}
+            for exc in exclude
         ]
 
     @staticmethod

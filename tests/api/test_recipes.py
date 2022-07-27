@@ -16,7 +16,7 @@ def test_search_invalid_sort(query, client):
 
 @patch("reciperadar.api.recipes.recrawl_search.delay")
 @patch("reciperadar.api.recipes.store_event")
-@patch("reciperadar.api.recipes.load_ingredient_synonyms")
+@patch("reciperadar.search.recipes.load_ingredient_synonyms")
 @patch("reciperadar.search.base.QueryRepository.es.search")
 def test_search_empty_query(search, synonyms, store, recrawl, client, raw_recipe_hit):
     hits = [raw_recipe_hit]
