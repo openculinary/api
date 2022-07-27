@@ -44,8 +44,10 @@ def load_ingredient_synonyms():
     if hasattr(app, "ingredient_synonyms"):
         if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
             return app.ingredient_synonyms
-    app.ingredient_synonyms = IngredientSearch().synonyms()
-    app.ingredient_synonyms_loaded_at = datetime.utcnow()
+    synonyms = IngredientSearch().synonyms()
+    if synonyms:
+        app.ingredient_synonyms = synonyms
+        app.ingredient_synonyms_loaded_at = datetime.utcnow()
     return app.ingredient_synonyms
 
 
