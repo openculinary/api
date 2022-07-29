@@ -55,7 +55,7 @@ def test_search_simple_query(query, synonyms, store, recrawl, client, raw_recipe
     }
     synonyms.return_value = {}
 
-    response = client.get("/recipes/search?include[]=tomato&exclude[]=tomato")
+    response = client.get("/recipes/search?ingredients[]=tomato&ingredients[]=-tomato")
 
     assert response.status_code == 200
     assert "refinements" in response.json

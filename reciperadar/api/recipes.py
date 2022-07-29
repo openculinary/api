@@ -39,8 +39,6 @@ def dietary_args(args):
 @app.route("/recipes/search")
 def recipe_search():
     ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
-    include = EntityClause.from_args(request.args.getlist("include[]"))
-    exclude = EntityClause.from_args(request.args.getlist("exclude[]"))
     equipment = EntityClause.from_args(request.args.getlist("equipment[]"))
     offset = min(request.args.get("offset", type=int, default=0), (25 * 10) - 10)
     limit = min(request.args.get("limit", type=int, default=10), 10)
@@ -50,15 +48,6 @@ def recipe_search():
 
     if sort and sort not in RecipeSearch.sort_methods():
         return abort(400)
-
-    # TODO: Remove: backwards-compatibility
-    # Disable the 'positive' flag on excluded ingredients
-    for ingredient in exclude:
-        ingredient.positive = False
-
-    # TODO: Remove: backwards-compatibility
-    # Combine the include and exclude ingredient lists
-    ingredients = ingredients or (include + exclude)
 
     results = RecipeSearch().query(
         ingredients=ingredients,
@@ -73,10 +62,11 @@ def recipe_search():
     user_agent = request.headers.get("user-agent")
     suspected_bot = ua_parser(user_agent or "").is_bot
 
-    # Perform a recrawl for the search to find any new/missing recipes
-    equipment = EntityClause.term_list(equipment)
     include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
     exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
+    equipment = EntityClause.term_list(equipment)
+
+    # Perform a recrawl for the search to find any new/missing recipes
     recrawl_search.delay(include, exclude, equipment, offset)
 
     # Log a search event
@@ -112,7 +102,6 @@ def recipe_explore():
     user_agent = request.headers.get("user-agent")
     suspected_bot = ua_parser(user_agent or "").is_bot
 
-    # TODO: De-duplicate this logic; it also appears in RecipeSearch.explore
     include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
     exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
     depth = len(ingredients)
