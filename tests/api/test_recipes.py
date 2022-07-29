@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 from reciperadar.search.recipes import RecipeSearch
+from reciperadar.search.base import EntityClause
 
 
 @patch.object(RecipeSearch, "query")
@@ -38,6 +39,33 @@ def test_search_empty_query(search, synonyms, store, recrawl, client, raw_recipe
     assert "refinements" in response.json
     assert "empty_query" in response.json["refinements"]
     assert "domains" in response.json["facets"]
+
+
+@patch("reciperadar.api.recipes.recrawl_search.delay")
+@patch("reciperadar.api.recipes.store_event")
+@patch("reciperadar.search.recipes.load_ingredient_synonyms")
+@patch("reciperadar.search.recipes.RecipeSearch.query")
+def test_search_simple_query(query, synonyms, store, recrawl, client, raw_recipe_hit):
+    query.return_value = {
+        "authority": "api",
+        "total": 0,
+        "results": [],
+        "facets": {"domains": []},
+        "refinements": [],
+    }
+    synonyms.return_value = {}
+
+    response = client.get("/recipes/search?include[]=tomato&exclude[]=tomato")
+
+    assert response.status_code == 200
+    assert "refinements" in response.json
+    assert "domains" in response.json["facets"]
+
+    expected_clauses = [
+        EntityClause(term="tomato", positive=True),
+        EntityClause(term="tomato", positive=False),
+    ]
+    assert query.call_args[1]["ingredients"] == expected_clauses
 
 
 @patch("werkzeug.datastructures.Headers.get")

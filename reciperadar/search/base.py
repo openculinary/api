@@ -8,6 +8,9 @@ class EntityClause(object):
         self.term = term
         self.positive = positive
 
+    def __eq__(self, obj):
+        return self.term == obj.term and self.positive == obj.positive
+
     @property
     def negative(self):
         return not self.positive
