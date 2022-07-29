@@ -38,6 +38,7 @@ def dietary_args(args):
 
 @app.route("/recipes/search")
 def recipe_search():
+    ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
     include = EntityClause.from_args(request.args.getlist("include[]"))
     exclude = EntityClause.from_args(request.args.getlist("exclude[]"))
     equipment = EntityClause.from_args(request.args.getlist("equipment[]"))
@@ -57,7 +58,7 @@ def recipe_search():
 
     # TODO: Remove: backwards-compatibility
     # Combine the include and exclude ingredient lists
-    ingredients = include + exclude
+    ingredients = ingredients or (include + exclude)
 
     results = RecipeSearch().query(
         ingredients=ingredients,
