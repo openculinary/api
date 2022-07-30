@@ -24,7 +24,7 @@ class EntityClause(object):
         return [EntityClause.from_arg(arg) for arg in args]
 
     @staticmethod
-    def term_list(clauses, synonyms=None, condition=lambda x: True):
+    def term_list(clauses, condition=lambda x: True, synonyms=None):
         synonyms = synonyms or {}
         terms = set()
         for clause in filter(condition, clauses):

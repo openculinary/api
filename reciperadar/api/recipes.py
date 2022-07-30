@@ -62,8 +62,8 @@ def recipe_search():
     user_agent = request.headers.get("user-agent")
     suspected_bot = ua_parser(user_agent or "").is_bot
 
-    include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
+    include = EntityClause.term_list(ingredients, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, lambda x: x.negative)
     equipment = EntityClause.term_list(equipment)
 
     # Perform a recrawl for the search to find any new/missing recipes
@@ -102,8 +102,8 @@ def recipe_explore():
     user_agent = request.headers.get("user-agent")
     suspected_bot = ua_parser(user_agent or "").is_bot
 
-    include = EntityClause.term_list(ingredients, None, lambda x: x.positive)
-    exclude = EntityClause.term_list(ingredients, None, lambda x: x.negative)
+    include = EntityClause.term_list(ingredients, lambda x: x.positive)
+    exclude = EntityClause.term_list(ingredients, lambda x: x.negative)
     depth = len(ingredients)
     limit = 10 if depth >= 3 else 0
 

@@ -29,7 +29,7 @@ class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_include_clause(ingredients):
         synonyms = load_ingredient_synonyms()
-        include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
+        include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
         return [
             {
                 "constant_score": {
@@ -43,7 +43,7 @@ class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_include_exact_clause(ingredients):
         synonyms = load_ingredient_synonyms()
-        include = EntityClause.term_list(ingredients, synonyms, lambda x: x.positive)
+        include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
         return [
             {
                 "nested": {
@@ -62,7 +62,7 @@ class RecipeSearch(QueryRepository):
     @staticmethod
     def _generate_exclude_clause(ingredients):
         synonyms = load_ingredient_synonyms()
-        exclude = EntityClause.term_list(ingredients, synonyms, lambda x: x.negative)
+        exclude = EntityClause.term_list(ingredients, lambda x: x.negative, synonyms)
         return [
             # exclude 'hidden' recipes
             {"match": {"hidden": True}},
