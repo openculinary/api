@@ -23,9 +23,7 @@ class Recipe(Storable, Searchable):
     nutrition_source = db.Column(db.String)
     ingredients = db.relationship("RecipeIngredient", passive_deletes="all")
     directions = db.relationship("RecipeDirection", passive_deletes="all")
-    nutrition = db.relationship(
-        "RecipeNutrition", backref="recipe", uselist=False, passive_deletes="all"
-    )
+    nutrition = db.relationship("RecipeNutrition", uselist=False, passive_deletes="all")
     is_dairy_free = db.Column(db.Boolean)
     is_gluten_free = db.Column(db.Boolean)
     is_vegan = db.Column(db.Boolean)
