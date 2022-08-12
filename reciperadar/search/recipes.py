@@ -15,7 +15,7 @@ def load_ingredient_synonyms():
         if datetime.utcnow() < g.ingredient_synonyms_loaded_at + timedelta(hours=1):
             return g.ingredient_synonyms
 
-    # Attempt to update the synonym cache
+    # Otherwise, attempt to update the synonym cache
     synonyms = IngredientSearch().synonyms()
     if synonyms:
         g.ingredient_synonyms = synonyms
