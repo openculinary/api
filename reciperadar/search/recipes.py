@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime, timedelta
+from flask import g
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
@@ -10,19 +11,19 @@ from reciperadar.search.ingredients import IngredientSearch
 @app.before_first_request
 def load_ingredient_synonyms():
     # Return cached synonyms if they are available and have not yet expired
-    if hasattr(app, "ingredient_synonyms"):
-        if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
-            return app.ingredient_synonyms
+    if "ingredient_synonyms" in g:
+        if datetime.utcnow() < g.ingredient_synonyms_loaded_at + timedelta(hours=1):
+            return g.ingredient_synonyms
 
-    # Attempt to update the synonym cache
+    # Otherwise, attempt to update the synonym cache
     synonyms = IngredientSearch().synonyms()
     if synonyms:
-        app.ingredient_synonyms = synonyms
-        app.ingredient_synonyms_loaded_at = datetime.utcnow()
+        g.ingredient_synonyms = synonyms
+        g.ingredient_synonyms_loaded_at = datetime.utcnow()
 
     # Return the latest-known synonyms
-    if hasattr(app, "ingredient_synonyms"):
-        return app.ingredient_synonyms
+    if "ingredient_synonyms" in g:
+        return g.ingredient_synonyms
 
 
 class RecipeSearch(QueryRepository):
