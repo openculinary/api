@@ -152,7 +152,7 @@ class RecipeSearch(QueryRepository):
 
         return {"bool": conditions}
 
-    def _product_aggregatation(self):
+    def _product_aggregation(self):
         return {
             "singular": {
                 "terms": {
@@ -165,7 +165,7 @@ class RecipeSearch(QueryRepository):
 
     def _product_suggestions(self, ingredients, dietary_properties):
         product_filter = self._product_filter(ingredients, dietary_properties)
-        product_aggregation = self._product_aggregatation()
+        product_aggregation = self._product_aggregation()
         return {
             "products": {
                 "nested": {"path": "ingredients"},
