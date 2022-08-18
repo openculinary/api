@@ -67,7 +67,7 @@ def recipe_search():
     equipment = EntityClause.term_list(equipment)
 
     # Perform a recrawl for the search to find any new/missing recipes
-    recrawl_search.delay(include, exclude, equipment, offset)
+    recrawl_search.delay(include, exclude, equipment, dietary_properties, offset)
 
     # Log a search event
     store_event.delay(
@@ -78,6 +78,7 @@ def recipe_search():
             "include": include,
             "exclude": exclude,
             "equipment": equipment,
+            "dietary_properties": dietary_properties,
             "offset": offset,
             "limit": limit,
             "sort": sort,
