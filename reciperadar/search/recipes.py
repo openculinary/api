@@ -7,7 +7,6 @@ from reciperadar.search.base import EntityClause, QueryRepository
 from reciperadar.search.ingredients import IngredientSearch
 
 
-@app.before_first_request
 def load_ingredient_synonyms():
     # Return cached synonyms if they are available and have not yet expired
     if hasattr(app, "ingredient_synonyms"):
