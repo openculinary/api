@@ -30,9 +30,9 @@ class RecipeDirection(Storable):
             index=doc["index"],
             description=doc["description"],
             markup=doc["markup"],
-            appliances=list(filter(lambda e: type(e) == DirectionAppliance, equipment)),
-            utensils=list(filter(lambda e: type(e) == DirectionUtensil, equipment)),
-            vessels=list(filter(lambda e: type(e) == DirectionVessel, equipment)),
+            appliances=list(filter(lambda e: type(e) is DirectionAppliance, equipment)),
+            utensils=list(filter(lambda e: type(e) is DirectionUtensil, equipment)),
+            vessels=list(filter(lambda e: type(e) is DirectionVessel, equipment)),
         )
 
     def to_dict(self):
