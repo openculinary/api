@@ -9,8 +9,8 @@ class Feedback(object):
         from reciperadar import app, mail
 
         with app.app_context():
-            title = issue.pop("issue") or "(empty)"
-            title = title if len(title) < 25 else f"{title[:25]}..."
+            issue = issue.pop("issue") or "(empty)"
+            title = issue if len(issue) < 25 else f"{issue[:25]}..."
 
             html = "<html><body><table>"
             for k, v in issue.items():
@@ -18,7 +18,7 @@ class Feedback(object):
                 html += f"<th>{k}</th>"
                 html += f"<td>{v}</td>"
                 html += "</tr>"
-            html += f"</table><hr /><p>{title}</p></body></html>"
+            html += f"</table><hr /><p>{issue}</p></body></html>"
 
             message = Message(
                 subject=f"User feedback: {title}",
