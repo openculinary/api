@@ -1,6 +1,6 @@
 from abc import ABC
 
-from elasticsearch import Elasticsearch
+from opensearchpy import OpenSearch
 
 
 class EntityClause(object):
@@ -36,4 +36,4 @@ class EntityClause(object):
 class QueryRepository(object):
     __metaclass__ = ABC
 
-    es = Elasticsearch("opensearch")
+    es = OpenSearch("opensearch")

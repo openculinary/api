@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod, abstractproperty
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
+from opensearchpy import OpenSearch
+from opensearchpy.exceptions import NotFoundError
 
 from reciperadar import db
 
@@ -17,7 +17,7 @@ class Storable(db.Model):
 class Searchable(object):
     __metaclass__ = ABC
 
-    es = Elasticsearch("opensearch")
+    es = OpenSearch("opensearch")
 
     @abstractmethod
     def from_doc(doc):
