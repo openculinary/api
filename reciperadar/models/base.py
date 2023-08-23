@@ -17,7 +17,7 @@ class Storable(db.Model):
 class Searchable(object):
     __metaclass__ = ABC
 
-    es = Elasticsearch("elasticsearch")
+    es = Elasticsearch("opensearch")
 
     @abstractmethod
     def from_doc(doc):
