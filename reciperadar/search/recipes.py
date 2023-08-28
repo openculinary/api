@@ -381,8 +381,8 @@ class RecipeSearch(QueryRepository):
         match we also need to check the 'ingredient.product.singular' field and
         record whether the query term was present.
 
-        To achieve this, we use Elasticsearch's query syntax to encode
-        information about the quality of each match during search execution.
+        To achieve this, we use OpenSearch's query syntax to encode information
+        about the quality of each match during search execution.
 
         We use `constant_score` queries to store a power-of-ten score for each
         query ingredient, with the value doubled for exact matches.
