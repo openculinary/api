@@ -16,8 +16,7 @@ def recipe_redirect(recipe_id):
         event_data={
             "recipe_id": recipe.id,
             "domain": recipe.domain,
-            "from_url": request.form.get("Ping-From") or request.headers.get("Referer"),
-            "to_url": recipe.dst,
+            "dst": recipe.dst,
         },
     )
 

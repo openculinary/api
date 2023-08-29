@@ -9,8 +9,7 @@ def _expected_redirect_call(recipe):
         event_data={
             "recipe_id": recipe.id,
             "domain": recipe.domain,
-            "from_url": "http://example.org/origin",
-            "to_url": recipe.dst,
+            "dst": recipe.dst,
         },
     )
 
