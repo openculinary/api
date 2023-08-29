@@ -1,11 +1,11 @@
-from flask import abort, redirect
+from flask import abort, jsonify, redirect, request
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
 from reciperadar.workers.events import store_event
 
 
-@app.route("/redirect/recipe/<recipe_id>")
+@app.route("/redirect/recipe/<recipe_id>", methods=["GET", "POST"])
 def recipe_redirect(recipe_id):
     recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
@@ -20,4 +20,7 @@ def recipe_redirect(recipe_id):
         },
     )
 
-    return redirect(recipe.src, code=301)
+    if request.method == "GET":
+        return redirect(recipe.src, code=301)
+    else:
+        return jsonify({})
