@@ -16,11 +16,12 @@ def recipe_redirect(recipe_id):
         event_data={
             "recipe_id": recipe.id,
             "domain": recipe.domain,
-            "src": recipe.src,
+            "from_url": request.form.get("Ping-From") or request.headers.get("Referer"),
+            "to_url": recipe.dst,
         },
     )
 
     if request.method == "GET":
-        return redirect(recipe.src, code=301)
+        return redirect(recipe.dst, code=301)
     else:
         return jsonify({})
