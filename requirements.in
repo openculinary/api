@@ -1,4 +1,4 @@
-celery==5.3.3
+celery==5.3.4
 flask==2.3.3
 flask-cors==4.0.0
 flask-mail==0.9.1
