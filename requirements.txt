@@ -135,9 +135,9 @@ flask-cors==4.0.0 \
 flask-mail==0.9.1 \
     --hash=sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41
     # via -r requirements.in
-flask-sqlalchemy==3.0.5 \
-    --hash=sha256:c5765e58ca145401b52106c0f46178569243c5da25556be2c231ecc60867c5b1 \
-    --hash=sha256:cabb6600ddd819a9f859f36515bb1bd8e7dbf30206cc679d2b081dff9e383283
+flask-sqlalchemy==3.1.1 \
+    --hash=sha256:4ba4be7f419dc72f4efd8802d69974803c37259dd42f3913b0dcf75c9447e0a0 \
+    --hash=sha256:e4b68bb881802dda1a7d878b2fc84c06d1ee57fb40b874d3dc97dabfa36b8312
     # via -r requirements.in
 greenlet==2.0.2 \
     --hash=sha256:03a8f4f3430c3b3ff8d10a2a86028c660355ab637cee9333d63d66b56f09d52a \

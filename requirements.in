@@ -2,7 +2,7 @@ celery==5.3.4
 flask==2.3.3
 flask-cors==4.0.0
 flask-mail==0.9.1
-flask-sqlalchemy==3.0.5
+flask-sqlalchemy==3.1.1
 gunicorn==21.2.0
 opensearch-py==2.3.1
 sqlalchemy==2.0.20
