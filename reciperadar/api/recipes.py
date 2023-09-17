@@ -38,6 +38,14 @@ def dietary_args(args):
     ]
 
 
+def is_suspected_bot(user_agent):
+    user_agent = user_agent or ""
+    # ref: https://github.com/ua-parser/uap-core/issues/554
+    if "HeadlessChrome" in user_agent:
+        return True
+    return ua_parser(user_agent).is_bot
+
+
 @app.route("/recipes/search")
 def recipe_search():
     ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
@@ -62,7 +70,7 @@ def recipe_search():
     )
 
     user_agent = request.headers.get("user-agent")
-    suspected_bot = ua_parser(user_agent or "").is_bot
+    suspected_bot = is_suspected_bot(user_agent)
     print(f"user_agent: {user_agent}", file=sys.stderr)
     print(f"suspected_bot: {suspected_bot}", file=sys.stderr)
 
@@ -106,7 +114,7 @@ def recipe_explore():
     )
 
     user_agent = request.headers.get("user-agent")
-    suspected_bot = ua_parser(user_agent or "").is_bot
+    suspected_bot = is_suspected_bot(user_agent)
     print(f"user_agent: {user_agent}", file=sys.stderr)
     print(f"suspected_bot: {suspected_bot}", file=sys.stderr)
 
