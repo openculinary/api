@@ -1,5 +1,3 @@
-import sys
-
 from flask import abort, jsonify, request
 from user_agents import parse as ua_parser
 
@@ -71,8 +69,6 @@ def recipe_search():
 
     user_agent = request.headers.get("user-agent")
     suspected_bot = is_suspected_bot(user_agent)
-    print(f"user_agent: {user_agent}", file=sys.stderr)
-    print(f"suspected_bot: {suspected_bot}", file=sys.stderr)
 
     include = EntityClause.term_list(ingredients, lambda x: x.positive)
     exclude = EntityClause.term_list(ingredients, lambda x: x.negative)
@@ -115,8 +111,6 @@ def recipe_explore():
 
     user_agent = request.headers.get("user-agent")
     suspected_bot = is_suspected_bot(user_agent)
-    print(f"user_agent: {user_agent}", file=sys.stderr)
-    print(f"suspected_bot: {suspected_bot}", file=sys.stderr)
 
     include = EntityClause.term_list(ingredients, lambda x: x.positive)
     exclude = EntityClause.term_list(ingredients, lambda x: x.negative)
