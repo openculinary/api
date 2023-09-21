@@ -76,7 +76,8 @@ def recipe_search():
     dietary_properties = EntityClause.term_list(dietary_properties)
 
     # Perform a recrawl for the search to find any new/missing recipes
-    recrawl_search.delay(include, exclude, equipment, dietary_properties, offset)
+    if not suspected_bot:
+        recrawl_search.delay(include, exclude, equipment, dietary_properties, offset)
 
     # Log a search event
     store_event.delay(
