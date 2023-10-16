@@ -10,15 +10,15 @@ class EquipmentSearch(QueryRepository):
                     "filter": {
                         "bool": {
                             "should": [
-                                {"match": {"directions.equipment.name": prefix}},
-                                {"prefix": {"directions.equipment.name": prefix}},
+                                {"match": {"equipment_names": prefix}},
+                                {"prefix": {"equipment_names": prefix}},
                             ]
                         }
                     },
                     "aggregations": {
                         "equipment": {
                             "terms": {
-                                "field": "directions.equipment.name",
+                                "field": "equipment_names",
                                 "include": f"{prefix}.*",
                                 "min_doc_count": 1,
                                 "size": 10,
