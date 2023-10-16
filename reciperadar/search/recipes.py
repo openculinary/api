@@ -95,7 +95,7 @@ class RecipeSearch(QueryRepository):
             def exact_missing_count = product_count - exact_found_count;
 
             def relevance_score = (found_count * 2 + exact_found_count);
-            def normalized_score = _score / {score_limit};
+            def normalized_score = _score / {float(score_limit)};
             def missing_score = (exact_missing_count * 2 - missing_count);
             def missing_ratio = missing_count / product_count;
         """
