@@ -26,11 +26,15 @@ class EntityClause(object):
     @staticmethod
     def term_list(clauses, condition=lambda x: True, synonyms=None):
         synonyms = synonyms or {}
-        terms = set()
+        seen = set()
+        terms = []
         for clause in filter(condition, clauses):
             for expansion in synonyms.get(clause.term) or [clause.term]:
-                terms.add(expansion)
-        return list(terms)
+                if expansion in seen:
+                    continue
+                seen.add(expansion)
+                terms.append(expansion)
+        return terms
 
 
 class QueryRepository(object):

@@ -24,3 +24,14 @@ def test_entity_clause_term_list_expansion():
     actual_results = EntityClause.term_list(clauses, synonyms=synonyms)
 
     assert set(expected_results) == set(actual_results)
+
+
+def test_entity_clause_term_list_preserve_ordering():
+    args = ["cilantro", "basil"]
+    clauses = EntityClause.from_args(args)
+    synonyms = {"cilantro": ["cilantro", "coriander"]}
+
+    expected_results = ["cilantro", "coriander", "basil"]
+    actual_results = EntityClause.term_list(clauses, synonyms=synonyms)
+
+    assert expected_results == actual_results
