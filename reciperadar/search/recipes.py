@@ -76,7 +76,7 @@ class RecipeSearch(QueryRepository):
         conditions = defaultdict(list)
         for item in equipment:
             condition = "filter" if item.positive else "must_not"
-            match = {"match": {"directions.equipment.name": item.term}}
+            match = {"match": {"equipment_names": item.term}}
             conditions[condition].append(match)
         return {"bool": conditions}
 
