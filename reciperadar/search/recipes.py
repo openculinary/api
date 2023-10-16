@@ -82,7 +82,7 @@ class RecipeSearch(QueryRepository):
 
     @staticmethod
     def sort_methods(match_count=1):
-        score_limit = pow(10, match_count) * 2
+        score_limit = pow(10, match_count) * 2.0
         preamble = f"""
             def product_count = doc.product_count.value;
             def exact_found_count = 0;
