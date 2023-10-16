@@ -81,34 +81,35 @@ class RecipeSearch(QueryRepository):
         return {"bool": conditions}
 
     @staticmethod
-    def sort_methods():
-        preamble = """
+    def sort_methods(match_count=1):
+        score_limit = pow(10, match_count) * 2
+        preamble = f"""
             def product_count = doc.product_count.value;
             def exact_found_count = 0;
             def found_count = 0;
-            for (def score = (long) _score; score > 0; score /= 10) {
+            for (def score = (long) _score; score > 0; score /= 10) {{
                 if (score % 10 > 2) exact_found_count++;
                 if (score % 10 > 0) found_count++;
-            }
+            }}
             def missing_count = product_count - found_count;
             def exact_missing_count = product_count - exact_found_count;
 
             def relevance_score = (found_count * 2 + exact_found_count);
-            def normalized_rating = doc.rating.value / 10;
+            def normalized_score = _score / {float(score_limit)};
             def missing_score = (exact_missing_count * 2 - missing_count);
             def missing_ratio = missing_count / product_count;
         """
         return {
             # rank: number of ingredient matches
-            # tiebreak: recipe rating
+            # tiebreak: normalized relevance score
             "relevance": {
-                "script": f"{preamble} relevance_score + normalized_rating",
+                "script": f"{preamble} relevance_score + normalized_score",
                 "order": "desc",
             },
             # rank: number of missing ingredients
-            # tiebreak: recipe rating
+            # tiebreak: normalized relevance score
             "ingredients": {
-                "script": f"{preamble} missing_score + 1 - normalized_rating",
+                "script": f"{preamble} missing_score + 1 - normalized_score",
                 "order": "asc",
             },
             # rank: preparation time
@@ -124,9 +125,10 @@ class RecipeSearch(QueryRepository):
         if not sort:
             sort = "relevance"
         # if no ingredients are specified, we may be able to short-cut sorting
-        if not any([x.positive for x in ingredients]) and sort != "duration":
+        include = [True for x in ingredients if x.positive]
+        if include == [] and sort != "duration":
             return {"script": "doc.rating.value", "order": "desc"}
-        return self.sort_methods()[sort]
+        return self.sort_methods(match_count=len(include))[sort]
 
     def _domain_facets(self):
         return {"domains": {"terms": {"field": "domain", "size": 100}}}
