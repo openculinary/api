@@ -279,17 +279,7 @@ class RecipeSearch(QueryRepository):
                         exact_match=exact_match,
                         min_include_match=min_include_match,
                     )
-                    yield query, sort_method, "partial"
-
-            query, sort_method = self._render_query(
-                ingredients=ingredients,
-                equipment=equipment,
-                dietary_properties=dietary_properties,
-                sort=sort,
-                exact_match=False,
-                min_include_match=1 if positive_ingredients else 0,
-            )
-            yield query, sort_method, "match_any"
+                    yield query, sort_method, "match_any"
 
     def query(
         self,
