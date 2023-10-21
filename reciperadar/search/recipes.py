@@ -268,8 +268,8 @@ class RecipeSearch(QueryRepository):
             yield query, sort_method, None
 
         positive_ingredients = sum([x.positive for x in ingredients])
-        if positive_ingredients:
-            for min_include_match in range(positive_ingredients, 1, -1):
+        if positive_ingredients > 1:
+            for min_include_match in range(positive_ingredients - 1, 0, -1):
                 for exact_match in [False]:
                     query, sort_method = self._render_query(
                         ingredients=ingredients,
