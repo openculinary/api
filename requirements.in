@@ -1,9 +1,9 @@
-celery==5.3.4
+celery==5.3.5
 flask==3.0.0
 flask-cors==4.0.0
 flask-mail==0.9.1
 flask-sqlalchemy==3.1.1
 gunicorn==21.2.0
 opensearch-py==2.3.2
-sqlalchemy==2.0.22
+sqlalchemy==2.0.23
 user-agents==2.2.0
