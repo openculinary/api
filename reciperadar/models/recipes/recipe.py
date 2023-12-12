@@ -31,7 +31,7 @@ class Recipe(Storable, Searchable):
 
     indexed_at = db.Column(db.DateTime)
 
-    redirected_id = db.Column(db.String, redirected_fk)
+    redirected_id = db.Column(db.String)
     redirected_at = db.Column(db.DateTime)
 
     @property
