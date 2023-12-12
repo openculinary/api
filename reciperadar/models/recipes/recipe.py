@@ -31,6 +31,9 @@ class Recipe(Storable, Searchable):
 
     indexed_at = db.Column(db.DateTime)
 
+    redirected_id = db.Column(db.String, redirected_fk)
+    redirected_at = db.Column(db.DateTime)
+
     @property
     def noun(self):
         return "recipes"
@@ -86,6 +89,8 @@ class Recipe(Storable, Searchable):
             servings=doc["servings"],
             time=doc["time"],
             rating=doc["rating"],
+            redirected_id=doc.get("redirected_id"),
+            redirected_at=doc.get("redirected_at"),
         )
 
     def to_dict(self, ingredients=None):
