@@ -6,11 +6,6 @@ def index_recipe(recipe_id):
     pass
 
 
-@celery.task(queue="process_recipe")
-def process_recipe(recipe_id):
-    pass
-
-
 @celery.task(queue="crawl_recipe")
 def crawl_recipe(url):
     pass
