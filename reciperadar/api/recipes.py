@@ -1,3 +1,5 @@
+import sys
+
 from flask import abort, jsonify, request
 from user_agents import parse as ua_parser
 
@@ -14,6 +16,13 @@ def recipe_view(recipe_id):
     recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
         return abort(404)
+
+    if recipe.redirected_id:
+        print(
+            f"Redirecting from_id={recipe.id} to_id={recipe.redirected_id}",
+            file=sys.stderr,
+        )
+        return recipe_view(recipe.redirected_id)
 
     results = {
         "total": 1,
