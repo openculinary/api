@@ -15,6 +15,9 @@ def recipe_view(recipe_id):
     if not recipe:
         return abort(404)
 
+    if recipe.redirected_id:
+        return recipe_view(recipe.redirected_id)
+
     results = {
         "total": 1,
         "results": [recipe.to_dict()],
