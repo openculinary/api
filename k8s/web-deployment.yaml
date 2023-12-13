@@ -22,23 +22,23 @@ spec:
         ports:
         - containerPort: 8000
         env:
-          - name: MAIL_USERNAME
-            valueFrom:
-              secretKeyRef:
-                name: api-contact-mail
-                key: username
-          - name: MAIL_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: api-contact-mail
-                key: password
+        - name: MAIL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: api-contact-mail
+              key: username
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: api-contact-mail
+              key: password
         securityContext:
           readOnlyRootFilesystem: true
         volumeMounts:
-          - mountPath: /var/tmp
-            name: var-tmp
+        - mountPath: /var/tmp
+          name: var-tmp
       volumes:
-        - name: var-tmp
-          emptyDir:
-            medium: "Memory"
-            sizeLimit: "128Mi"
+      - name: var-tmp
+        emptyDir:
+          medium: "Memory"
+          sizeLimit: "128Mi"
