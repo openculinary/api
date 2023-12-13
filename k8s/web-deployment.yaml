@@ -32,3 +32,13 @@ spec:
               secretKeyRef:
                 name: api-contact-mail
                 key: password
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+          - mountPath: /var/tmp
+            name: var-tmp
+      volumes:
+        - name: var-tmp
+          emptyDir:
+            medium: "Memory"
+            sizeLimit: "128Mi"
