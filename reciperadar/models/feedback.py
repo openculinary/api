@@ -1,7 +1,7 @@
 from flask_mail import Message
 
 
-class Feedback(object):
+class Feedback:
     __tablename__ = "feedback"
 
     @staticmethod

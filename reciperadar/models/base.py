@@ -14,7 +14,7 @@ class Storable(db.Model):
         )
 
 
-class Searchable(object):
+class Searchable:
     __metaclass__ = ABC
 
     es = OpenSearch("opensearch")

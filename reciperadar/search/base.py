@@ -3,7 +3,7 @@ from abc import ABC
 from opensearchpy import OpenSearch
 
 
-class EntityClause(object):
+class EntityClause:
     def __init__(self, term, positive):
         self.term = term
         self.positive = positive
@@ -37,7 +37,7 @@ class EntityClause(object):
         return terms
 
 
-class QueryRepository(object):
+class QueryRepository:
     __metaclass__ = ABC
 
     es = OpenSearch("opensearch")
