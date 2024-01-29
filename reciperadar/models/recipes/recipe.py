@@ -78,9 +78,11 @@ class Recipe(Storable, Searchable):
                 for direction in doc.get("directions") or []
                 if direction["description"].strip()
             ],
-            nutrition=RecipeNutrition.from_doc(doc["nutrition"])
-            if doc.get("nutrition")
-            else None,
+            nutrition=(
+                RecipeNutrition.from_doc(doc["nutrition"])
+                if doc.get("nutrition")
+                else None
+            ),
             nutrition_source=doc.get("nutrition_source"),
             is_dairy_free=doc.get("is_dairy_free"),
             is_gluten_free=doc.get("is_gluten_free"),
@@ -114,9 +116,11 @@ class Recipe(Storable, Searchable):
             "author": self.author,
             "author_url": self.author_url,
             "image_url": self.image_path,
-            "nutrition": self.nutrition.to_dict()
-            if self.nutrition and self.nutrition_source == "crawler"
-            else None,
+            "nutrition": (
+                self.nutrition.to_dict()
+                if self.nutrition and self.nutrition_source == "crawler"
+                else None
+            ),
             "is_dairy_free": self.is_dairy_free,
             "is_gluten_free": self.is_gluten_free,
             "is_vegan": self.is_vegan,
