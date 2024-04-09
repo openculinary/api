@@ -20,6 +20,7 @@ class Searchable:
     es = OpenSearch("opensearch")
 
     @abstractmethod
+    @staticmethod
     def from_doc(doc):
         pass
 
