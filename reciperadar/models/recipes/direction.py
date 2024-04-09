@@ -21,7 +21,7 @@ class RecipeDirection(Storable):
     vessels = db.relationship("DirectionVessel", passive_deletes="all")
 
     @staticmethod
-    def from_doc(doc, matches=None):
+    def from_doc(doc):
         equipment = [
             DirectionEquipment.from_doc(equipment) for equipment in doc["equipment"]
         ]
