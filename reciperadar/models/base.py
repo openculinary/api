@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 from opensearchpy import OpenSearch
 from opensearchpy.exceptions import NotFoundError
 
@@ -24,7 +24,8 @@ class Searchable:
     def from_doc(doc):
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def noun(self):
         pass
 
