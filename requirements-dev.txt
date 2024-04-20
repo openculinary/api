@@ -184,13 +184,8 @@ flask==3.0.3 \
     --hash=sha256:ceb27b0af3823ea2737928a4d99d125a06175b8512c445cbd9a9ce200ef76842
     # via
     #   -r requirements.txt
-    #   flask-cors
     #   flask-mail
     #   flask-sqlalchemy
-flask-cors==4.0.0 \
-    --hash=sha256:bc3492bfd6368d27cfe79c7821df5a8a319e1a6d5eab277a3794be19bdc51783 \
-    --hash=sha256:f268522fcb2f73e2ecdde1ef45e2fd5c71cc48fe03cffb4b441c6d1b40684eb0
-    # via -r requirements.txt
 flask-mail==0.9.1 \
     --hash=sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41
     # via -r requirements.txt
