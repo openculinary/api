@@ -1,8 +1,8 @@
 celery==5.4.0
 flask==3.0.3
-flask-mail==0.9.1
+flask-mail==0.10.0
 flask-sqlalchemy==3.1.1
 gunicorn==22.0.0
-opensearch-py==2.4.2
-sqlalchemy==2.0.30
+opensearch-py==2.6.0
+sqlalchemy==2.0.32
 user-agents==2.2.0
