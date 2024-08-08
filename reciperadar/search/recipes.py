@@ -10,7 +10,8 @@ from reciperadar.search.ingredients import IngredientSearch
 def load_ingredient_synonyms():
     # Return cached synonyms if they are available and have not yet expired
     if hasattr(app, "ingredient_synonyms"):
-        if datetime.now(tz=UTC) < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
+        expiry = app.ingredient_synonyms_loaded_at + timedelta(hours=1)
+        if datetime.now(tz=UTC) < expiry:
             return app.ingredient_synonyms
 
     # Otherwise, attempt to update the synonym cache
