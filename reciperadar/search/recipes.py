@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
@@ -10,14 +10,14 @@ from reciperadar.search.ingredients import IngredientSearch
 def load_ingredient_synonyms():
     # Return cached synonyms if they are available and have not yet expired
     if hasattr(app, "ingredient_synonyms"):
-        if datetime.utcnow() < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
+        if datetime.now(tz=UTC) < app.ingredient_synonyms_loaded_at + timedelta(hours=1):
             return app.ingredient_synonyms
 
     # Otherwise, attempt to update the synonym cache
     synonyms = IngredientSearch().synonyms()
     if synonyms:
         app.ingredient_synonyms = synonyms
-        app.ingredient_synonyms_loaded_at = datetime.utcnow()
+        app.ingredient_synonyms_loaded_at = datetime.now(tz=UTC)
 
     # Return the latest-known synonyms
     if hasattr(app, "ingredient_synonyms"):
