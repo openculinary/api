@@ -48,7 +48,7 @@ class Recipe(Storable, Searchable):
             ingredient.product.singular: ingredient.product
             for ingredient in self.ingredients
         }
-        return list(unique_products.values())
+        return unique_products.values()
 
     @property
     def hidden(self):
@@ -136,4 +136,4 @@ class Recipe(Storable, Searchable):
         contents = set()
         for product in self.products:
             contents |= set(product.contents or [])
-        return list(contents)
+        return sorted(contents)

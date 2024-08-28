@@ -51,9 +51,9 @@ def raw_recipe_hit():
                         "singular": "one",
                         "plural": "ones",
                         "contents": [
-                            "one",
-                            "content-of-one",
                             "ancestor-of-one",
+                            "content-of-one",
+                            "one",
                         ],
                     },
                     "product_is_plural": False,
