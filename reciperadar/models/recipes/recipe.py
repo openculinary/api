@@ -130,10 +130,3 @@ class Recipe(Storable, Searchable):
     @property
     def image_path(self):
         return f"images/recipes/{self.id}.png"
-
-    @property
-    def contents(self):
-        contents = set()
-        for product in self.products:
-            contents |= set(product.contents or [])
-        return sorted(contents)
