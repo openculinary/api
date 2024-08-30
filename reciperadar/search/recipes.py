@@ -431,9 +431,9 @@ class RecipeSearch(QueryRepository):
             results = self.es.search(
                 index="recipes",
                 body={
+                    "query": query,
                     "from": offset,
                     "size": limit,
-                    "query": query,
                     "sort": sort_method,
                     "aggs": aggregations,
                     "post_filter": post_filter,
