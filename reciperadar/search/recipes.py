@@ -191,17 +191,12 @@ class RecipeSearch(QueryRepository):
                 "type": "long",
                 "script": {
                     "source": """
+                        def products = Collections.unmodifiableSet(params._source['ingredients'].stream().map(ingredient -> ingredient.product.singular).collect(Collectors.toSet()));
+                        def contents = Collections.unmodifiableSet(params._source['contents'].stream().collect(Collectors.toSet()));
                         for (product in params.products) {
-                            long score = 0;
-                            if (params._source['contents'].contains(product)) {
-                                score = 1;
-                                for (ingredient in params._source['ingredients']) {
-                                    if (ingredient.product.singular == product) {
-                                        score = 2;
-                                    }
-                                }
-                            }
-                            emit(score);
+                            if (products.contains(product)) emit(2);
+                            else if (contents.contains(product)) emit(1);
+                            else emit(0);
                         }
                     """,
                     "params": {"products": include},
