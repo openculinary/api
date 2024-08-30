@@ -380,7 +380,7 @@ class RecipeSearch(QueryRepository):
         We use `constant_score` queries to store a power-of-ten score for each
         query ingredient, with the value doubled for exact matches.
 
-        For example, in a query for `onion`, `tomato`, `garlic`:
+        For example, in a query for `onion`, `tomato`, `tofu`:
 
                                 onion   tomato  tofu        score
         recipe 1                exact   exact   partial     300 + 30 + 1 = 331
