@@ -74,9 +74,9 @@ class RecipeSearch(QueryRepository):
             def product_count = doc.product_count.value;
             def exact_found_count = 0;
             def found_count = 0;
-            for (score in doc._found) {{
-                if (score > 1) exact_found_count++;
-                if (score > 0) found_count++;
+            for (is_exact in doc._found) {{
+                if (is_exact == true) exact_found_count++;
+                if (is_exact == false) found_count++;
             }}
             def missing_count = product_count - found_count;
             def exact_missing_count = product_count - exact_found_count;
@@ -188,15 +188,15 @@ class RecipeSearch(QueryRepository):
         include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
         derivations = {
             "_found": {
-                "type": "long",
+                "type": "boolean",
                 "script": {
                     "source": """
                         def products = Collections.unmodifiableSet(params._source['ingredients'].stream().map(ingredient -> ingredient.product.singular).collect(Collectors.toSet()));
                         def contents = Collections.unmodifiableSet(params._source['contents'].stream().collect(Collectors.toSet()));
                         for (product in params.products) {
-                            if (products.contains(product)) emit(2);
-                            else if (contents.contains(product)) emit(1);
-                            else emit(0);
+                            if (products.contains(product)) emit(true);
+                            else if (contents.contains(product)) emit(false);
+                            else emit(null);
                         }
                     """,
                     "params": {"products": include},
@@ -385,24 +385,24 @@ class RecipeSearch(QueryRepository):
         To achieve this, we use OpenSearch's query syntax to encode information
         about the quality of each match during search execution.
 
-        We use `derived` fields to emit a multi-valued integer score,
-        containing one value for each query ingredient -- zero for unmatched
-        ingredients, one for partial matches, and two for exact matches.
+        We use `derived` fields to emit a tri-state boolean score, containing
+        one value for each query ingredient -- `null` for unmatched
+        ingredients, `false` for partial matches, and `true` for exact matches.
 
         For example, in a query for `onion`, `tomato`, `tofu`:
 
                                 onion   tomato  tofu        _found
-        recipe 1                exact   exact   partial     [2, 2, 1]
-        recipe 2                partial no      exact       [1, 0, 2]
-        recipe 3                exact   no      exact       [2, 0, 2]
+        recipe 1                exact   exact   partial     [true, true, false]
+        recipe 2                partial no      exact       [false, null, true]
+        recipe 3                exact   no      exact       [true, null, true]
 
         This allows the final sorting stage to determine how many exact and
         inexact matches were discovered for each recipe.
 
-                                _found        exact_matches       all_matches
-        recipe 1                [2, 2, 1]     1 + 1 + 0 = 2       1 + 1 + 1 = 3
-        recipe 2                [1, 0, 2]     0 + 0 + 1 = 1       1 + 0 + 1 = 2
-        recipe 3                [2, 0, 2]     1 + 0 + 1 = 2       1 + 0 + 1 = 2
+                                _found                  exact_matches    all_matches
+        recipe 1                [true, true, false]     1 + 1 + 0 = 2    1 + 1 + 1 = 3
+        recipe 2                [false, null, true]     0 + 0 + 1 = 1    1 + 0 + 1 = 2
+        recipe 3                [true, null, true]      1 + 0 + 1 = 2    1 + 0 + 1 = 2
 
         At this stage we have enough information to sort the result set based
         on the number of overall matches and to use the number of exact matches
