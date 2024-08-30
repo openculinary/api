@@ -419,9 +419,7 @@ class RecipeSearch(QueryRepository):
             ingredients=ingredients,
             dietary_properties=dietary_properties,
         )
-        post_filter = self._generate_post_filter(
-            domains=domains,
-        )
+        post_filter = self._generate_post_filter(domains=domains)
 
         queries = self._refined_queries(
             ingredients=ingredients,
