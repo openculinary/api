@@ -27,34 +27,6 @@ def load_ingredient_synonyms():
 
 class RecipeSearch(QueryRepository):
     @staticmethod
-    def _generate_derived_fields(ingredients):
-        synonyms = load_ingredient_synonyms()
-        include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
-        derivations = {
-            "_found": {
-                "type": "long",
-                "script": {
-                    "source": """
-                        for (product in params.products) {
-                            long score = 0;
-                            if (params._source['contents'].contains(product)) {
-                                score = 1;
-                                for (ingredient in params._source['ingredients']) {
-                                    if (ingredient.product.singular == product) {
-                                        score = 2;
-                                    }
-                                }
-                            }
-                            emit(score);
-                        }
-                    """,
-                    "params": {"products": include},
-                },
-            }
-        }
-        return derivations, [field for field in derivations]
-
-    @staticmethod
     def _generate_include_clause(ingredients):
         synonyms = load_ingredient_synonyms()
         include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
@@ -209,6 +181,34 @@ class RecipeSearch(QueryRepository):
                 "aggs": aggregations,
             }
         }
+
+    @staticmethod
+    def _generate_derived_fields(ingredients):
+        synonyms = load_ingredient_synonyms()
+        include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
+        derivations = {
+            "_found": {
+                "type": "long",
+                "script": {
+                    "source": """
+                        for (product in params.products) {
+                            long score = 0;
+                            if (params._source['contents'].contains(product)) {
+                                score = 1;
+                                for (ingredient in params._source['ingredients']) {
+                                    if (ingredient.product.singular == product) {
+                                        score = 2;
+                                    }
+                                }
+                            }
+                            emit(score);
+                        }
+                    """,
+                    "params": {"products": include},
+                },
+            }
+        }
+        return derivations, [field for field in derivations]
 
     def _generate_post_filter(self, domains):
         conditions = defaultdict(list)
@@ -423,12 +423,12 @@ class RecipeSearch(QueryRepository):
         limit = max(0, limit)
         limit = min(25, limit)
 
-        derived, derived_fields = self._generate_derived_fields(ingredients=ingredients)
         aggregations = self._generate_aggregations(
             suggest_products=suggest_products,
             ingredients=ingredients,
             dietary_properties=dietary_properties,
         )
+        derived, derived_fields = self._generate_derived_fields(ingredients=ingredients)
         post_filter = self._generate_post_filter(domains=domains)
 
         queries = self._refined_queries(
@@ -442,10 +442,10 @@ class RecipeSearch(QueryRepository):
                 index="recipes",
                 body={
                     "query": query,
-                    "derived": derived,
-                    "fields": derived_fields,
                     "from": offset,
                     "size": limit,
+                    "derived": derived,
+                    "fields": derived_fields,
                     "sort": sort_method,
                     "aggs": aggregations,
                     "post_filter": post_filter,
