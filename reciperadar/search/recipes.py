@@ -56,15 +56,7 @@ class RecipeSearch(QueryRepository):
     def _generate_include_clause(ingredients):
         synonyms = load_ingredient_synonyms()
         include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
-        return [
-            {
-                "constant_score": {
-                    "boost": 1,
-                    "filter": {"match": {"contents": inc}},
-                }
-            }
-            for inc in include
-        ]
+        return [{"match": {"contents": inc}} for inc in include]
 
     @staticmethod
     def _generate_include_exact_clause(ingredients):
@@ -74,12 +66,7 @@ class RecipeSearch(QueryRepository):
             {
                 "nested": {
                     "path": "ingredients",
-                    "query": {
-                        "constant_score": {
-                            "boost": 1,
-                            "filter": {"match": {"ingredients.product.singular": inc}},
-                        }
-                    },
+                    "query": {"match": {"ingredients.product.singular": inc}},
                 }
             }
             for inc in include
