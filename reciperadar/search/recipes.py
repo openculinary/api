@@ -257,8 +257,7 @@ class RecipeSearch(QueryRepository):
             min_include_match = len(should)
 
         return {
-            "function_score": {
-                "boost_mode": "replace",
+            "script_score": {
                 "query": {
                     "bool": {
                         "should": should,
@@ -267,7 +266,7 @@ class RecipeSearch(QueryRepository):
                         "minimum_should_match": min_include_match,
                     }
                 },
-                "script_score": {"script": {"source": sort_params["script"]}},
+                "script": {"source": sort_params["script"]},
             }
         }, [{"_score": sort_params["order"]}]
 
