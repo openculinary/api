@@ -40,7 +40,9 @@ class RecipeSearch(QueryRepository):
                             if (params._source['contents'].contains(product)) {
                                 score = 1;
                                 for (ingredient in params._source['ingredients']) {
-                                    if (ingredient.product.singular == product) score = 2;
+                                    if (ingredient.product.singular == product) {
+                                        score = 2;
+                                    }
                                 }
                             }
                             emit(score);
