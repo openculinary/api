@@ -27,7 +27,7 @@ def load_ingredient_synonyms():
 
 class RecipeSearch(QueryRepository):
     @staticmethod
-    def _generate_found_clause(ingredients):
+    def _generate_derived_fields(ingredients):
         synonyms = load_ingredient_synonyms()
         include = EntityClause.term_list(ingredients, lambda x: x.positive, synonyms)
         derivations = {
@@ -423,7 +423,7 @@ class RecipeSearch(QueryRepository):
         limit = max(0, limit)
         limit = min(25, limit)
 
-        derived, derived_fields = self._generate_found_clause(ingredients=ingredients)
+        derived, derived_fields = self._generate_derived_fields(ingredients=ingredients)
         aggregations = self._generate_aggregations(
             suggest_products=suggest_products,
             ingredients=ingredients,
