@@ -3,6 +3,6 @@ flask==3.0.3
 flask-mail==0.10.0
 flask-sqlalchemy==3.1.1
 gunicorn==23.0.0
-opensearch-py==2.6.0
-sqlalchemy==2.0.32
+opensearch-py==2.7.1
+sqlalchemy==2.0.36
 user-agents==2.2.0
