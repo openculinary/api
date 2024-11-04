@@ -2,6 +2,7 @@ from flask import abort, jsonify, redirect, request
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
+from reciperadar.utils.bots import is_suspected_bot
 from reciperadar.workers.events import store_event
 
 
@@ -11,9 +12,13 @@ def recipe_redirect(recipe_id):
     if not recipe:
         return abort(404)
 
+    user_agent = request.headers.get("user-agent")
+    suspected_bot = is_suspected_bot(user_agent)
+
     store_event.delay(
         event_table="redirects",
         event_data={
+            "suspected_bot": suspected_bot,
             "recipe_id": recipe.id,
             "domain": recipe.domain,
             "dst": recipe.dst,

@@ -1,12 +1,12 @@
 import sys
 
 from flask import abort, jsonify, request
-from user_agents import parse as ua_parser
 
 from reciperadar import app
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import EntityClause
 from reciperadar.search.recipes import RecipeSearch
+from reciperadar.utils.bots import is_suspected_bot
 from reciperadar.workers.events import store_event
 from reciperadar.workers.searches import recrawl_search
 
@@ -43,14 +43,6 @@ def dietary_args(args):
             "vegetarian",
         }
     ]
-
-
-def is_suspected_bot(user_agent):
-    user_agent = user_agent or ""
-    # ref: https://github.com/ua-parser/uap-core/issues/554
-    if "HeadlessChrome" in user_agent:
-        return True
-    return ua_parser(user_agent).is_bot
 
 
 @app.route("/recipes/search")
