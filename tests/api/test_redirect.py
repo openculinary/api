@@ -7,6 +7,7 @@ def _expected_redirect_call(recipe):
     return call(
         event_table="redirects",
         event_data={
+            "suspected_bot": False,
             "recipe_id": recipe.id,
             "domain": recipe.domain,
             "dst": recipe.dst,
