@@ -1,14 +1,14 @@
-amqp==5.2.0 \
-    --hash=sha256:827cb12fb0baa892aad844fd95258143bce4027fdac4fccddbc43330fd281637 \
-    --hash=sha256:a1ecff425ad063ad42a486c902807d1482311481c8ad95a72694b2975e75f7fd
+amqp==5.3.1 \
+    --hash=sha256:43b3319e1b4e7d1251833a93d672b4af1e40f3d632d479b98661a95f117880a2 \
+    --hash=sha256:cddc00c725449522023bad949f70fff7b48f0b1ade74d170a6f10ab044739432
     # via kombu
 billiard==4.2.1 \
     --hash=sha256:12b641b0c539073fc8d3f5b8b7be998956665c4233c7c1fcd66a7e677c4fb36f \
     --hash=sha256:40b59a4ac8806ba2c2369ea98d876bc6108b051c227baffd928c644d15d8f3cb
     # via celery
-blinker==1.8.2 \
-    --hash=sha256:1779309f71bf239144b9399d06ae925637cf6634cf6bd131104184531bf67c01 \
-    --hash=sha256:8f77b09d3bf7c795e969e9486f39c2c5e9c39d4ee07424be2bc594ece9642d83
+blinker==1.9.0 \
+    --hash=sha256:b4ce2265a7abece45e7cc896e98dbebe6cead56bcf805a3d23136d145f5445bf \
+    --hash=sha256:ba0efaa9080b619ff2f3459d1d500c57bddea4a6b424b60a91141db6fd2f08bc
     # via
     #   flask
     #   flask-mail
@@ -153,9 +153,9 @@ click-repl==0.3.0 \
 events==0.5 \
     --hash=sha256:a7286af378ba3e46640ac9825156c93bdba7502174dd696090fdfcd4d80a1abd
     # via opensearch-py
-flask==3.0.3 \
-    --hash=sha256:34e815dfaa43340d1d15a5c3a02b8476004037eb4840b34910c6e21679d288f3 \
-    --hash=sha256:ceb27b0af3823ea2737928a4d99d125a06175b8512c445cbd9a9ce200ef76842
+flask==3.1.0 \
+    --hash=sha256:5f873c5184c897c8d9d1b05df1e3d01b14910ce69607a117bd3277098a5836ac \
+    --hash=sha256:d667207822eb83f1c4b50949b1623c8fc8d51f2341d65f72e1a1815397551136
     # via
     #   -r requirements.in
     #   flask-mail
@@ -332,9 +332,9 @@ opensearch-py==2.7.1 \
     --hash=sha256:5417650eba98a1c7648e502207cebf3a12beab623ffe0ebbf55f9b1b4b6e44e9 \
     --hash=sha256:67ab76e9373669bc71da417096df59827c08369ac3795d5438c9a8be21cbd759
     # via -r requirements.in
-packaging==24.1 \
-    --hash=sha256:026ed72c8ed3fcce5bf8950572258698927fd1dbda10a5e981cdf0ac37f4f002 \
-    --hash=sha256:5b8f2217dbdbd2f7f384c41c628544e6d52f2d0f53c6d0c3ea61aa5d1d7ff124
+packaging==24.2 \
+    --hash=sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759 \
+    --hash=sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f
     # via gunicorn
 prompt-toolkit==3.0.48 \
     --hash=sha256:d6623ab0477a80df74e646bdbc93621143f5caf104206aa29294d53de1a03d90 \
@@ -450,7 +450,7 @@ wcwidth==0.2.13 \
     --hash=sha256:3da69048e4540d84af32131829ff948f1e022c1c6bdb8d6102117aac784f6859 \
     --hash=sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5
     # via prompt-toolkit
-werkzeug==3.0.6 \
-    --hash=sha256:1bc0c2310d2fbb07b1dd1105eba2f7af72f322e1e455f2f93c993bee8c8a5f17 \
-    --hash=sha256:a8dd59d4de28ca70471a34cba79bed5f7ef2e036a76b3ab0835474246eb41f8d
+werkzeug==3.1.3 \
+    --hash=sha256:54b78bf3716d19a65be4fceccc0d1d7b89e608834989dfae50ea87564639213e \
+    --hash=sha256:60723ce945c19328679790e3282cc758aa4a6040e4bb330f53d30fa546d44746
     # via flask
