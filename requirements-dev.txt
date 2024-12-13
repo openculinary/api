@@ -418,9 +418,9 @@ requests==2.32.3 \
     --hash=sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760 \
     --hash=sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6
     # via opensearch-py
-six==1.16.0 \
-    --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
-    --hash=sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254
+six==1.17.0 \
+    --hash=sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274 \
+    --hash=sha256:ff70335d468e7eb6ec65b95b99d3a2836546063f63acc5171de367e834932a81
     # via python-dateutil
 sqlalchemy==2.0.36 \
     --hash=sha256:03e08af7a5f9386a43919eda9de33ffda16b44eb11f3b313e6822243770e9763 \
@@ -496,11 +496,9 @@ tzdata==2024.2 \
 ua-parser==1.0.0 \
     --hash=sha256:5b31133606a781f56692caa11a9671a9f330c22604b3c4957a7ba18c152212d0 \
     --hash=sha256:a9740f53f4fbb72b7a03d304cae32a2785cafc55e8207efb74877bba17c35324
-    # via
-    #   ua-parser-builtins
-    #   user-agents
-ua-parser-builtins==0.18.0 \
-    --hash=sha256:51cbc3d6ab9c533fc12fc7cededbef503c8d04e465d0aff20d869e15320b5ca9
+    # via user-agents
+ua-parser-builtins==0.18.0.post1 \
+    --hash=sha256:eb4f93504040c3a990a6b0742a2afd540d87d7f9f05fd66e94c101db1564674d
     # via ua-parser
 urllib3==2.2.3 \
     --hash=sha256:ca899ca043dcb1bafa3e262d73aa25c465bfb49e0bd9dd5d59f1d0acba2f8fac \
