@@ -18,12 +18,12 @@ def _expected_redirect_call(recipe):
 @patch("reciperadar.api.recipes.store_event.delay")
 @patch.object(Recipe, "get_by_id")
 def test_redirect_retrieval(get_recipe_by_id, store_event, client):
-    recipe = Recipe(id="example_id", domain="example.org", dst="http://example.org")
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
     get_recipe_by_id.return_value = recipe
 
     response = client.get(
         path="/redirect/recipe/example_id",
-        headers={"Referer": "http://example.org/origin"},
+        headers={"Referer": "http://example.test/origin"},
     )
 
     assert response.status_code == 301
@@ -34,13 +34,13 @@ def test_redirect_retrieval(get_recipe_by_id, store_event, client):
 @patch("reciperadar.api.recipes.store_event.delay")
 @patch.object(Recipe, "get_by_id")
 def test_redirect_ping(get_recipe_by_id, store_event, client):
-    recipe = Recipe(id="example_id", domain="example.org", dst="http://example.org")
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
     get_recipe_by_id.return_value = recipe
 
     response = client.post(
         path="/redirect/recipe/example_id",
         data={
-            "Ping-From": "http://example.org/origin",
+            "Ping-From": "http://example.test/origin",
             "Ping-To": recipe.dst,
         },
     )
