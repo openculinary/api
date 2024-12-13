@@ -23,7 +23,7 @@ def test_feedback_invalid_uri(distribute, client):
         path="/feedback",
         json=[
             {},
-            "http://example.org",
+            "http://example.test",
         ],
     )
 
