@@ -15,7 +15,6 @@ class Recipe(Storable, Searchable):
     domain = db.Column(db.String)
     author = db.Column(db.String)
     author_url = db.Column(db.String)
-    image_src = db.Column(db.String)
     time = db.Column(db.Integer)
     servings = db.Column(db.Integer)
     rating = db.Column(db.Float)
@@ -67,7 +66,6 @@ class Recipe(Storable, Searchable):
             domain=doc["domain"],
             author=doc.get("author"),
             author_url=doc.get("author_url"),
-            image_src=doc.get("image_src"),
             ingredients=[
                 RecipeIngredient.from_doc(ingredient)
                 for ingredient in doc["ingredients"]

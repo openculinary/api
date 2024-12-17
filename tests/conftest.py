@@ -82,7 +82,6 @@ def raw_recipe_hit():
                 },
             ],
             "author": "example",
-            "image_src": "http://www.example.test/path/image.png?v=123",
             "time": 30,
             "src": "http://www.example.test/recipes/test",
             "dst": "https://www.example.test/recipes/test",
