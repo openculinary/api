@@ -48,7 +48,6 @@ def dietary_args(args):
 @app.route("/recipes/search")
 def recipe_search():
     ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
-    equipment = EntityClause.from_args(request.args.getlist("equipment[]"))
     offset = min(request.args.get("offset", type=int, default=0), (25 * 10) - 10)
     limit = min(request.args.get("limit", type=int, default=10), 10)
     sort = request.args.get("sort", type=str)
@@ -60,7 +59,6 @@ def recipe_search():
 
     results = RecipeSearch().query(
         ingredients=ingredients,
-        equipment=equipment,
         offset=offset,
         limit=limit,
         sort=sort,
@@ -73,12 +71,11 @@ def recipe_search():
 
     include = EntityClause.term_list(ingredients, lambda x: x.positive)
     exclude = EntityClause.term_list(ingredients, lambda x: x.negative)
-    equipment = EntityClause.term_list(equipment)
     dietary_properties = EntityClause.term_list(dietary_properties)
 
     # Perform a recrawl for the search to find any new/missing recipes
     if not suspected_bot:
-        recrawl_search.delay(include, exclude, equipment, dietary_properties, offset)
+        recrawl_search.delay(include, exclude, [], dietary_properties, offset)
 
     # Log a search event
     store_event.delay(
@@ -88,7 +85,7 @@ def recipe_search():
             "path": request.path,
             "include": include,
             "exclude": exclude,
-            "equipment": equipment,
+            "equipment": [],
             "dietary_properties": dietary_properties,
             "offset": offset,
             "limit": limit,
