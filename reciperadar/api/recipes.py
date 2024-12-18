@@ -48,6 +48,7 @@ def dietary_args(args):
 @app.route("/recipes/search")
 def recipe_search():
     ingredients = EntityClause.from_args(request.args.getlist("ingredients[]"))
+    equipment = EntityClause.from_args(request.args.getlist("equipment[]"))
     offset = min(request.args.get("offset", type=int, default=0), (25 * 10) - 10)
     limit = min(request.args.get("limit", type=int, default=10), 10)
     sort = request.args.get("sort", type=str)
@@ -59,6 +60,7 @@ def recipe_search():
 
     results = RecipeSearch().query(
         ingredients=ingredients,
+        equipment=equipment,
         offset=offset,
         limit=limit,
         sort=sort,

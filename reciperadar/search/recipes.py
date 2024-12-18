@@ -271,6 +271,7 @@ class RecipeSearch(QueryRepository):
     def query(
         self,
         ingredients,
+        equipment,
         offset,
         limit,
         sort,
@@ -455,12 +456,16 @@ class RecipeSearch(QueryRepository):
                 for bucket in content["buckets"]
             ]
 
+        refinements = [refinement] if recipes and refinement else []
+        if equipment:
+            refinements += ["equipment_search_unavailable"]
+
         return {
             "authority": "api",
             "total": min(results["hits"]["total"]["value"], 25 * limit),
             "results": recipes,
             "facets": facets,
-            "refinements": [refinement] if recipes and refinement else [],
+            "refinements": refinements,
         }
 
     def explore(self, ingredients, dietary_properties):
