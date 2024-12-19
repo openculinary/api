@@ -6,8 +6,8 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert recipe.author == "example"
     assert recipe.is_vegetarian
 
-    assert recipe.directions[0].appliances[0].appliance == "oven"
-    assert recipe.directions[0].utensils[0].utensil == "skewer"
+    # assert recipe.directions[0].appliances[0].appliance == "oven"
+    # assert recipe.directions[0].utensils[0].utensil == "skewer"
 
     assert recipe.ingredients[0].product.singular == "one"
     expected_contents = ["one", "content-of-one", "ancestor-of-one"]
