@@ -1,5 +1,6 @@
 from reciperadar import db
 from reciperadar.models.base import Searchable, Storable
+from reciperadar.models.recipes.direction import RecipeDirection
 from reciperadar.models.recipes.ingredient import RecipeIngredient
 from reciperadar.models.recipes.nutrition import RecipeNutrition
 
@@ -20,6 +21,7 @@ class Recipe(Storable, Searchable):
     nutrition = db.Column(db.JSON)
     nutrition_source = db.Column(db.String)
     ingredients = db.relationship("RecipeIngredient", passive_deletes="all")
+    directions = db.relationship("RecipeDirection", passive_deletes="all")
     nutrition = db.relationship("RecipeNutrition", uselist=False, passive_deletes="all")
     is_dairy_free = db.Column(db.Boolean)
     is_gluten_free = db.Column(db.Boolean)
@@ -68,6 +70,11 @@ class Recipe(Storable, Searchable):
                 RecipeIngredient.from_doc(ingredient)
                 for ingredient in doc["ingredients"]
                 if ingredient["description"].strip()
+            ],
+            directions=[
+                RecipeDirection.from_doc(direction)
+                for direction in doc.get("directions") or []
+                if direction["description"].strip()
             ],
             nutrition=(
                 RecipeNutrition.from_doc(doc["nutrition"])
