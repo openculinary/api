@@ -73,15 +73,6 @@ class RecipeSearch(QueryRepository):
         ]
 
     @staticmethod
-    def _generate_equipment_clause(equipment):
-        conditions = defaultdict(list)
-        for item in equipment:
-            condition = "filter" if item.positive else "must_not"
-            match = {"match": {"equipment_names": item.term}}
-            conditions[condition].append(match)
-        return {"bool": conditions}
-
-    @staticmethod
     def sort_methods(match_count=1):
         score_limit = pow(10, match_count) * 2
         preamble = f"""
@@ -207,7 +198,6 @@ class RecipeSearch(QueryRepository):
     def _render_query(
         self,
         ingredients,
-        equipment,
         dietary_properties,
         sort,
         exact_match=True,
@@ -216,12 +206,11 @@ class RecipeSearch(QueryRepository):
         include_exact_clause = self._generate_include_exact_clause(ingredients)
         include_clause = self._generate_include_clause(ingredients)
         exclude_clause = self._generate_exclude_clause(ingredients)
-        equipment_clause = self._generate_equipment_clause(equipment)
         sort_params = self._generate_sort_method(ingredients, sort)
 
         should = include_exact_clause if exact_match else include_clause
         must_not = exclude_clause
-        filter = [equipment_clause] + [
+        filter = [
             {"range": {"time": {"gte": 5}}},
             {"range": {"product_count": {"gt": 0}}},
         ]
@@ -246,12 +235,11 @@ class RecipeSearch(QueryRepository):
             }
         }, [{"_score": sort_params["order"]}]
 
-    def _refined_queries(self, ingredients, equipment, dietary_properties, sort):
+    def _refined_queries(self, ingredients, dietary_properties, sort):
         # Provide an 'empty query' hint
-        if not any([ingredients, equipment, sort]):
+        if not any([ingredients, sort]):
             query, sort_method = self._render_query(
                 ingredients=ingredients,
-                equipment=equipment,
                 dietary_properties=dietary_properties,
                 sort=sort,
             )
@@ -261,7 +249,6 @@ class RecipeSearch(QueryRepository):
         for exact_match in [False]:
             query, sort_method = self._render_query(
                 ingredients=ingredients,
-                equipment=equipment,
                 dietary_properties=dietary_properties,
                 exact_match=exact_match,
                 sort=sort,
@@ -274,7 +261,6 @@ class RecipeSearch(QueryRepository):
                 for exact_match in [False]:
                     query, sort_method = self._render_query(
                         ingredients=ingredients,
-                        equipment=equipment,
                         dietary_properties=dietary_properties,
                         sort=sort,
                         exact_match=exact_match,
@@ -423,7 +409,6 @@ class RecipeSearch(QueryRepository):
 
         queries = self._refined_queries(
             ingredients=ingredients,
-            equipment=equipment,
             dietary_properties=dietary_properties,
             sort=sort,
         )
@@ -471,12 +456,16 @@ class RecipeSearch(QueryRepository):
                 for bucket in content["buckets"]
             ]
 
+        refinements = [refinement] if recipes and refinement else []
+        if equipment:
+            refinements += ["equipment_search_unavailable"]
+
         return {
             "authority": "api",
             "total": min(results["hits"]["total"]["value"], 25 * limit),
             "results": recipes,
             "facets": facets,
-            "refinements": [refinement] if recipes and refinement else [],
+            "refinements": refinements,
         }
 
     def explore(self, ingredients, dietary_properties):
@@ -484,7 +473,6 @@ class RecipeSearch(QueryRepository):
         limit = 10 if depth >= 3 else 0
         return self.query(
             ingredients=ingredients,
-            equipment=[],
             offset=0,
             limit=limit,
             sort=None,
