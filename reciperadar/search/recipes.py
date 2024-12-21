@@ -473,6 +473,7 @@ class RecipeSearch(QueryRepository):
         limit = 10 if depth >= 3 else 0
         return self.query(
             ingredients=ingredients,
+            equipment=[],
             offset=0,
             limit=limit,
             sort=None,
