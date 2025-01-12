@@ -4,5 +4,5 @@ flask-mail==0.10.0
 flask-sqlalchemy==3.1.1
 gunicorn==23.0.0
 opensearch-py==2.8.0
-sqlalchemy==2.0.36
+sqlalchemy==2.0.37
 user-agents==2.2.0
