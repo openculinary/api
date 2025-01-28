@@ -13,10 +13,12 @@ def recipe_report(recipe_id):
 
     report_json = request.json
     report_type = report_json["report_type"]
+    result_index = report_json["result_index"]
     report_data = report_json[report_type]
 
     Feedback.report(
         report_type=report_type,
+        result_index=result_index,
         report_data=report_data,
     )
 
