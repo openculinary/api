@@ -2,8 +2,6 @@ from flask_mail import Message
 
 
 class Feedback:
-    __tablename__ = "feedback"
-
     @staticmethod
     def distribute(issue, image):
         from reciperadar import app, mail
