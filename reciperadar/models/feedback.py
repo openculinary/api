@@ -28,11 +28,11 @@ class Feedback:
             mail.send(message)
 
     @staticmethod
-    def report(recipe_id, report_type, report_data):
+    def report(recipe_id, report_type, result_index, report_data):
         from reciperadar import app, mail
 
         with app.app_context():
-            msg = f"Please investigate recipeId {recipe_id!r} for {report_type} issues"
+            msg = f"Please inspect {recipe_id!r} at {result_index} for {report_type}"
             html = f"<html><body>{msg}</body></html>"
 
             # TODO: add per-report-type content inspection instructions
