@@ -26,3 +26,21 @@ class Feedback:
             )
             message.attach("screenshot.png", "image/png", image)
             mail.send(message)
+
+    @staticmethod
+    def report(recipe_id, report_type, report_data):
+        from reciperadar import app, mail
+
+        with app.app_context():
+            msg = f"Please investigate recipeId {recipe_id!r} for {report_type} issues"
+            html = f"<html><body>{msg}</body></html>"
+
+            # TODO: add per-report-type content inspection instructions
+
+            message = Message(
+                subject=f"Content report: {report_type}: {recipe_id}",
+                sender="contact@reciperadar.com",
+                recipients=["content-reports@reciperadar.com"],
+                html=html,
+            )
+            mail.send(message)
