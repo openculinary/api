@@ -13,7 +13,7 @@ def recipe_redirect(recipe_id):
         return abort(404)
 
     user_agent = request.headers.get("user-agent")
-    suspected_bot = is_suspected_bot(user_agent)
+    suspected_bot = request.method == "GET" or is_suspected_bot(user_agent)
 
     store_event.delay(
         event_table="redirects",
