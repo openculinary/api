@@ -47,7 +47,7 @@ class Feedback:
             # 2. unsafe content:
             #   a) check that the domain name is a recipe domain already contained within the reciperadar database with indexing enabled.
             #   b) if check (a) fails, do nothing and stop processing this request.
-            #   b) if check (a) succeeds, remove the recipe from the database and search index.
+            #   b) if check (a) succeeds, remove the recipe from the database and search index, then generate an updated current-backup.
             #
             # 3. corrections:
             #   a) open the relevant recipe search result in the application.
