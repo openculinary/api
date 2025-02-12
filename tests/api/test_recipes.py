@@ -1,3 +1,4 @@
+import pytest
 from unittest.mock import patch
 
 from reciperadar.api.recipes import Feedback
@@ -109,6 +110,35 @@ def test_bot_search(query, store, recrawl, client):
 
     assert store.called
     assert store.call_args[1]["event_data"]["suspected_bot"] is True
+
+
+@patch.object(Feedback, "report")
+@patch.object(Recipe, "get_by_id")
+@pytest.mark.parametrize(
+    "report_data",
+    [
+        # missing report type
+        '{"result_index": 0, "unsafe_content": {}}',
+        # non-integer index
+        '{"report_type": "unsafe_content", "result_index": "", "unsafe_content": {}}',
+        # missing content
+        '{"report_type": "removal_request", "result_index": 0, "other_content": {}}',
+        # invalid report type
+        '{"report_type": "invalid", "result_index": 0, "invalid": {}}',
+    ],
+)
+def test_invalid_problem_report(get_recipe_by_id, report, client, report_data):
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
+    get_recipe_by_id.return_value = recipe
+
+    response = client.post(
+        path="/recipes/recipe_id_0/report",
+        headers={"Content-Type": "application/json"},
+        data=report_data,
+    )
+
+    assert not report.called
+    assert response.status_code == 400
 
 
 @patch.object(Feedback, "report")

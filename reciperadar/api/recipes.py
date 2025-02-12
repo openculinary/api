@@ -145,10 +145,16 @@ def recipe_report(recipe_id):
     if not recipe:
         return abort(404)
 
-    report_json = request.json
-    report_type = report_json["report_type"]
-    result_index = report_json["result_index"]
-    report_data = report_json[report_type]
+    try:
+        report_json = request.json
+        report_type = report_json["report_type"]
+        result_index = int(report_json["result_index"])
+        report_data = report_json[report_type]
+    except Exception:
+        return abort(400)
+
+    if report_type not in {"removal_request", "unsafe_content", "correction"}:
+        return abort(400)
 
     Feedback.report(
         report_type=report_type,
