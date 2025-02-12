@@ -1,5 +1,7 @@
 from unittest.mock import patch
 
+from reciperadar.api.recipes import Feedback
+from reciperadar.models.recipes import Recipe
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.search.base import EntityClause
 
@@ -107,3 +109,23 @@ def test_bot_search(query, store, recrawl, client):
 
     assert store.called
     assert store.call_args[1]["event_data"]["suspected_bot"] is True
+
+
+@patch.object(Feedback, "report")
+@patch.object(Recipe, "get_by_id")
+def test_unsafe_content_report(get_recipe_by_id, report, client):
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
+    get_recipe_by_id.return_value = recipe
+
+    report_data = {
+        "report_type": "unsafe_content",
+        "result_index": 0,
+        "unsafe_content": {"content_type": "other"},
+    }
+    response = client.post(
+        path="/recipes/recipe_id_0/report",
+        json=report_data,
+    )
+
+    assert report.called
+    assert response.status_code == 200
