@@ -146,10 +146,8 @@ def recipe_report(recipe_id):
         return abort(404)
 
     try:
-        report_json = request.json
-        report_type = report_json["report_type"]
-        result_index = int(report_json["result_index"])
-        report_data = report_json[report_type]
+        report_type = request.form.get("report_type")
+        result_index = request.form.get("result_index", type=int)
     except Exception:
         return abort(400)
 
@@ -159,7 +157,7 @@ def recipe_report(recipe_id):
     Feedback.report(
         report_type=report_type,
         result_index=result_index,
-        report_data=report_data,
+        report_data=request.form,
     )
 
     return jsonify({"recipe_id": recipe_id})
