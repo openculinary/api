@@ -106,7 +106,6 @@ class Recipe(Storable, Searchable):
             "domain": self.domain,
             "author": self.author,
             "author_url": self.author_url,
-            "image_url": self.image_path,
             "nutrition": (
                 self.nutrition.to_dict()
                 if self.nutrition and self.nutrition_source == "crawler"
@@ -117,7 +116,3 @@ class Recipe(Storable, Searchable):
             "is_vegan": self.is_vegan,
             "is_vegetarian": self.is_vegetarian,
         }
-
-    @property
-    def image_path(self):
-        return f"images/recipes/{self.id}.png"
