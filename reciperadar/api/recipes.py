@@ -139,8 +139,15 @@ def recipe_explore():
     return jsonify(results)
 
 
-@app.route("/recipes/<recipe_id>/report", methods=["POST"])
-def recipe_report(recipe_id):
+@app.route("/recipes/report", methods=["POST"])
+def recipe_report():
+    try:
+        recipe_id = request.form.get("recipe_id")
+    except Exception:
+        return abort(400)
+    if not recipe_id:
+        return abort(400)
+
     recipe = Recipe().get_by_id(recipe_id)
     if not recipe:
         return abort(404)
