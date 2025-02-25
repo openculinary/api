@@ -158,7 +158,7 @@ def recipe_report():
     except Exception:
         return abort(400)
 
-    if report_type not in {"removal_request", "unsafe_content", "correction"}:
+    if report_type not in {"removal-request", "unsafe-content", "correction"}:
         return abort(400)
 
     Feedback.report(

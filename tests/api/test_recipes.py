@@ -122,7 +122,7 @@ def test_bot_search(query, store, recrawl, client):
         # non-integer index
         {
             "recipe_id": "recipe_id_0",
-            "report_type": "unsafe_content",
+            "report_type": "unsafe-content",
             "result_index": "",
         },
         # invalid report type
@@ -151,7 +151,7 @@ def test_unsafe_content_report(get_recipe_by_id, report, client):
 
     report_data = {
         "recipe_id": "test_recipe_id",
-        "report_type": "unsafe_content",
+        "report_type": "unsafe-content",
         "result_index": 0,
     }
     response = client.post(

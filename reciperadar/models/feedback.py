@@ -38,7 +38,7 @@ class Feedback:
         from reciperadar import app, mail
 
         with app.app_context():
-            template = f"problem-report/{report_type}.html"
+            template = f"problem-report/{report_type.replace('-', '_')}.html"
             template_context = {
                 **report_data,
                 "recipe_id": recipe_id,
