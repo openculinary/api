@@ -142,7 +142,7 @@ def recipe_explore():
 @app.route("/recipes/report", methods=["POST"])
 def recipe_report():
     try:
-        recipe_id = request.form.get("recipe_id")
+        recipe_id = request.form.get("recipe-id")
     except Exception:
         return abort(400)
     if not recipe_id:
@@ -153,8 +153,8 @@ def recipe_report():
         return abort(404)
 
     try:
-        report_type = request.form.get("report_type")
-        result_index = request.form.get("result_index", type=int)
+        report_type = request.form.get("report-type")
+        result_index = request.form.get("result-index", type=int)
     except Exception:
         return abort(400)
 

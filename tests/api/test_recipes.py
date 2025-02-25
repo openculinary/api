@@ -118,15 +118,15 @@ def test_bot_search(query, store, recrawl, client):
     "report_data",
     [
         # missing report type
-        {"recipe_id": "recipe_id_0", "result_index": 0},
+        {"recipe-id": "recipe_id_0", "result-index": 0},
         # non-integer index
         {
-            "recipe_id": "recipe_id_0",
-            "report_type": "unsafe-content",
-            "result_index": "",
+            "recipe-id": "recipe_id_0",
+            "report-type": "unsafe-content",
+            "result-index": "",
         },
         # invalid report type
-        {"recipe_id": "recipe_id_0", "report_type": "invalid", "result_index": 0},
+        {"recipe-id": "recipe_id_0", "report-type": "invalid", "result-index": 0},
     ],
 )
 def test_invalid_problem_report(get_recipe_by_id, report, client, report_data):
@@ -150,9 +150,9 @@ def test_unsafe_content_report(get_recipe_by_id, report, client):
     get_recipe_by_id.return_value = recipe
 
     report_data = {
-        "recipe_id": "test_recipe_id",
-        "report_type": "unsafe-content",
-        "result_index": 0,
+        "recipe-id": "test_recipe_id",
+        "report-type": "unsafe-content",
+        "result-index": 0,
     }
     response = client.post(
         path="/recipes/report",
