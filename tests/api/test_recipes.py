@@ -120,7 +120,11 @@ def test_bot_search(query, store, recrawl, client):
         # missing report type
         {"recipe_id": "recipe_id_0", "result_index": 0},
         # non-integer index
-        {"recipe_id": "recipe_id_0", "report_type": "unsafe_content", "result_index": ""},
+        {
+            "recipe_id": "recipe_id_0",
+            "report_type": "unsafe_content",
+            "result_index": "",
+        },
         # invalid report type
         {"recipe_id": "recipe_id_0", "report_type": "invalid", "result_index": 0},
     ],
