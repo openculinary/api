@@ -3,7 +3,13 @@ import sys
 from flask import abort, jsonify, request
 
 from reciperadar import app
-from reciperadar.models.feedback import Feedback
+from reciperadar.models.feedback import (
+    Correction,
+    Feedback,
+    ProblemReport,
+    RemovalRequest,
+    UnsafeContent,
+)
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import EntityClause
 from reciperadar.search.recipes import RecipeSearch
@@ -155,16 +161,53 @@ def recipe_report():
     try:
         report_type = request.form.get("report-type")
         result_index = request.form.get("result-index", type=int)
+        assert report_type and result_index is not None
     except Exception:
         return abort(400)
 
-    if report_type not in {"removal-request", "unsafe-content", "correction"}:
+    try:
+        report: ProblemReport | None = None
+        match report_type:
+            case "removal-request":
+                content_owner_email, content_reuse_policy, content_noindex_directive = (
+                    request.form.get("content-owner-email"),
+                    request.form.get("content-reuse-policy"),
+                    request.form.get("content-noindex-directive"),
+                )
+                assert content_owner_email or content_reuse_policy
+                assert content_noindex_directive is not None
+                report = RemovalRequest(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                    content_owner_email=content_owner_email,
+                    content_reuse_policy=content_reuse_policy,
+                    content_noindex_directive=bool(content_noindex_directive),
+                )
+            case "unsafe-content":
+                report = UnsafeContent(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                )
+            case "correction":
+                content_expected, content_found = (
+                    request.form.get("context-expected"),
+                    request.form.get("context-found"),
+                )
+                assert content_expected and content_found
+                assert content_expected != content_found
+                report = Correction(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                    content_expected=content_expected,
+                    content_found=content_found,
+                )
+            case _:
+                return abort(400)
+    except AssertionError:
         return abort(400)
 
-    Feedback.report(
-        report_type=report_type,
-        result_index=result_index,
-        report_data=request.form,
-    )
-
-    return jsonify({"recipe_id": recipe_id})
+    Feedback.register_report(report)
+    return jsonify({"recipe_id": report["recipe_id"]})

@@ -1,5 +1,36 @@
+from typing import Literal, ReadOnly, Required, TypedDict
+
 from flask.templating import render_template
 from flask_mail import Message
+
+
+class ProblemReport(TypedDict):
+    recipe_id: Required[ReadOnly[str]]
+    report_type: Required[
+        ReadOnly[
+            Literal[
+                "removal-request",
+                "unsafe-content",
+                "correction",
+            ]
+        ]
+    ]
+    result_index: Required[ReadOnly[int]]
+
+
+class RemovalRequest(ProblemReport):
+    content_owner_email: Required[ReadOnly[str | None]]
+    content_reuse_policy: Required[ReadOnly[str | None]]
+    content_noindex_directive: Required[ReadOnly[bool]]
+
+
+class UnsafeContent(ProblemReport):
+    pass
+
+
+class Correction(ProblemReport):
+    content_expected: Required[ReadOnly[str]]
+    content_found: Required[ReadOnly[str]]
 
 
 class Feedback:
@@ -34,18 +65,13 @@ class Feedback:
             mail.send(message)
 
     @staticmethod
-    def report(recipe_id, report_type, result_index, report_data):
+    def register_report(report: ProblemReport) -> None:
         from reciperadar import app, mail
 
         with app.app_context():
+            recipe_id, report_type = report["recipe_id"], report["report_type"]
             template = f"problem-report/{report_type.replace('-', '_')}.html"
-            template_context = {
-                **report_data,
-                "recipe_id": recipe_id,
-                "report_type": report_type,
-                "result_index": result_index,
-            }
-            html = render_template(template, **template_context)
+            html = render_template(template, report=report)
 
             message = Feedback._construct(
                 subject=f"Content report: {report_type}: {recipe_id}",

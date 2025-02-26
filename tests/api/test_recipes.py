@@ -112,7 +112,7 @@ def test_bot_search(query, store, recrawl, client):
     assert store.call_args[1]["event_data"]["suspected_bot"] is True
 
 
-@patch.object(Feedback, "report")
+@patch.object(Feedback, "register_report")
 @patch.object(Recipe, "get_by_id")
 @pytest.mark.parametrize(
     "report_data",
@@ -143,9 +143,9 @@ def test_invalid_problem_report(get_recipe_by_id, report, client, report_data):
     assert response.status_code == 400
 
 
-@patch.object(Feedback, "report")
+@patch.object(Feedback, "register_report")
 @patch.object(Recipe, "get_by_id")
-def test_unsafe_content_report(get_recipe_by_id, report, client):
+def test_unsafe_content_report(get_recipe_by_id, register_report, client):
     recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
     get_recipe_by_id.return_value = recipe
 
@@ -159,5 +159,5 @@ def test_unsafe_content_report(get_recipe_by_id, report, client):
         data=report_data,
     )
 
-    assert report.called
+    assert register_report.called
     assert response.status_code == 200
