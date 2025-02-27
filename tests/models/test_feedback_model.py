@@ -9,6 +9,7 @@ def test_feedback(construct):
     construct.return_value = message = MagicMock()
     recipe = Recipe(
         id="test_recipe_id",
+        title="marvellous recipe",
         domain="example.test",
         dst="http://example.test",
     )
@@ -16,6 +17,7 @@ def test_feedback(construct):
         recipe_id=recipe.id,
         report_type="removal_request",
         result_index=0,
+        content_owner_email="webmaster@example.test",
     )
     Feedback.register_report(recipe, report)
 

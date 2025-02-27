@@ -1,6 +1,7 @@
-<!--
-a) open the relevant recipe search result in the application.
-b) confirm that the reported mistake exists in the recipe, and inspect for any other apparent problems.
-c) file a bugreport against the 'crawler' microservice with details of the expected and found results.
--->
-<html><body>Please inspect {{ recipe_id }} for {{ report_type }}</body></html>
+<html>
+  <body>
+    <p>Unsafe content has been reported for <a href="https://www.reciperadar.com/#action=view&id={{ recipe.id }}">{{ recipe.title }}</a>.</p>
+    <p>Please remove the recipe from our search engine index, database, and backups.</p>
+    <p>If the problem occurs for all recipe webpages on {{ recipe.domain }}, then disable indexing for that domain, and remove all recipes from our search engine index, database and backups.</p>
+  </body>
+</html>
