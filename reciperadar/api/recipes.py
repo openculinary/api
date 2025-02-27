@@ -209,5 +209,5 @@ def recipe_report():
     except AssertionError:
         return abort(400)
 
-    Feedback.register_report(report)
+    Feedback.register_report(recipe, report)
     return jsonify({"recipe_id": report["recipe_id"]})

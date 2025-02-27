@@ -3,6 +3,8 @@ from typing import Literal, ReadOnly, Required, TypedDict
 from flask.templating import render_template
 from flask_mail import Message
 
+from reciperadar.models.recipes import Recipe
+
 
 class ProblemReport(TypedDict):
     recipe_id: Required[ReadOnly[str]]
@@ -65,16 +67,16 @@ class Feedback:
             mail.send(message)
 
     @staticmethod
-    def register_report(report: ProblemReport) -> None:
+    def register_report(recipe: Recipe, report: ProblemReport) -> None:
         from reciperadar import app, mail
 
         with app.app_context():
-            recipe_id, report_type = report["recipe_id"], report["report_type"]
+            report_type = report["report_type"]
             template = f"problem-report/{report_type.replace('-', '_')}.html"
-            html = render_template(template, report=report)
+            html = render_template(template, recipe=recipe, report=report)
 
             message = Feedback._construct(
-                subject=f"Content report: {report_type}: {recipe_id}",
+                subject=f"Content report: {report_type}: {recipe.id}",
                 sender="contact@reciperadar.com",
                 recipients=["content-reports@reciperadar.com"],
                 html=html,
