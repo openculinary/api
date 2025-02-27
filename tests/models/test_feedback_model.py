@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 from reciperadar.models.feedback import Feedback, RemovalRequest
 from reciperadar.models.recipes import Recipe
@@ -6,7 +6,7 @@ from reciperadar.models.recipes import Recipe
 
 @patch.object(Feedback, "_construct")
 def test_feedback(construct):
-    construct.return_value = message = MagicMock()
+    construct.return_value = MagicMock()
     recipe = Recipe(
         id="test_recipe_id",
         title="marvellous recipe",
@@ -30,4 +30,4 @@ def test_feedback(construct):
     assert recipients == ["content-reports@reciperadar.com"]
     assert "recipe removal request" in html
     assert "https://www.reciperadar.com/#action=view&id=test_recipe_id" in html
-    assert f'<a href="mailto:webmaster@example.test">' in html
+    assert '<a href="mailto:webmaster@example.test">' in html
