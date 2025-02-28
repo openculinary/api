@@ -161,8 +161,13 @@ def recipe_report():
     try:
         report_type = request.form.get("report-type")
         result_index = request.form.get("result-index", type=int)
-        assert report_type and result_index is not None
     except Exception:
+        return abort(400)
+
+    if not report_type:
+        return abort(400)
+
+    if result_index is None:
         return abort(400)
 
     try:
@@ -174,8 +179,10 @@ def recipe_report():
                     request.form.get("content-reuse-policy"),
                     request.form.get("content-noindex-directive"),
                 )
-                assert content_owner_email or content_reuse_policy
-                assert content_noindex_directive is not None
+                if not (content_owner_email or content_reuse_policy):
+                    return abort(400)
+                if content_noindex_directive is None:
+                    return abort(400)
                 report = RemovalRequest(
                     recipe_id=recipe_id,
                     report_type=report_type,
@@ -195,8 +202,10 @@ def recipe_report():
                     request.form.get("context-expected"),
                     request.form.get("context-found"),
                 )
-                assert content_expected and content_found
-                assert content_expected != content_found
+                if not (content_expected and content_found):
+                    return abort(400)
+                if content_expected == content_found:
+                    return abort(400)
                 report = Correction(
                     recipe_id=recipe_id,
                     report_type=report_type,
