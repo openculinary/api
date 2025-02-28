@@ -1,0 +1,23 @@
+<html>
+  <body>
+    <p>A recipe removal request has been received for <a href="https://www.reciperadar.com/#action=view&id={{ recipe.id }}">{{ recipe.title }}</a>.</p>
+
+    {% if report.content_owner_email %}
+    <p>If in doubt, verify the identity of the requestor by <a href="mailto:{{ report.content_owner_email }}">contacting them</a>.</p>
+    {% endif %}
+
+    {% if report.content_reuse_policy %}
+    <p>The reporter has provided a <a href="{{ report.content_reuse_policy }}">content usage policy covering the recipe</a>.  Confirm that the recipe to be removed is covered by the policy.</p>
+    {% endif %}
+
+    {% if report.content_noindex_directive %}
+    <p>The reporter also indicates that there is an HTML <pre>noindex</pre> directive that indicates that the content should not be included in search engine indices.</p>
+    {% endif %}
+
+    <p>If you believe that the recipe should indeed be removed, delete it from the search engine index, database, and backups.</p>
+
+    {% if report.content_owner_email %}
+    <p><a href="mailto:{{ report.content_owner_email }}">Contact the content owner</a> to confirm that their content has been removed.</a></p>
+    {% endif %}
+  </body>
+</html>

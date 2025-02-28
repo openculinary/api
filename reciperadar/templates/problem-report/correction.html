@@ -1,0 +1,11 @@
+<html>
+  <body>
+    <p>A possible correction has been reported for <a href="https://www.reciperadar.com/#action=view&id={{ recipe.id }}">{{ recipe.title }}</a>.</p>
+    <ul>
+      <li><strong>Expected:</strong> {{ report.content_expected }}</li>
+      <li><strong>Found:</strong> {{ report.content_found }}</li>
+    </ul>
+    <p>Please inspect the recipe and determine whether the problem is from the <a href="{{ recipe.dst }}">origin recipe webpage</a> or whether we have processed the data incorrectly.</p>
+    <p>File a <a href="https://github.com/openculinary/crawler/issues">data bugreport</a> if the issue relates to the way we have processed the recipe.</p>
+  </body>
+</html>

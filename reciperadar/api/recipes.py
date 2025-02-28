@@ -3,6 +3,13 @@ import sys
 from flask import abort, jsonify, request
 
 from reciperadar import app
+from reciperadar.models.feedback import (
+    Correction,
+    Feedback,
+    ProblemReport,
+    RemovalRequest,
+    UnsafeContent,
+)
 from reciperadar.models.recipes import Recipe
 from reciperadar.search.base import EntityClause
 from reciperadar.search.recipes import RecipeSearch
@@ -136,3 +143,80 @@ def recipe_explore():
     )
 
     return jsonify(results)
+
+
+@app.route("/recipes/report", methods=["POST"])
+def recipe_report():
+    try:
+        recipe_id = request.form.get("recipe-id")
+    except Exception:
+        return abort(400)
+    if not recipe_id:
+        return abort(400)
+
+    recipe = Recipe().get_by_id(recipe_id)
+    if not recipe:
+        return abort(404)
+
+    try:
+        report_type = request.form.get("report-type")
+        result_index = 0  # request.form.get("result-index", type=int)
+    except Exception:
+        return abort(400)
+
+    if not report_type:
+        return abort(400)
+
+    if result_index is None:
+        return abort(400)
+
+    try:
+        report: ProblemReport | None = None
+        match report_type:
+            case "removal-request":
+                content_owner_email, content_reuse_policy, content_noindex_directive = (
+                    request.form.get("content-owner-email"),
+                    request.form.get("content-reuse-policy"),
+                    request.form.get("content-noindex-directive"),
+                )
+                if not (content_owner_email or content_reuse_policy):
+                    return abort(400)
+                if content_noindex_directive is None:
+                    return abort(400)
+                report = RemovalRequest(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                    content_owner_email=content_owner_email,
+                    content_reuse_policy=content_reuse_policy,
+                    content_noindex_directive=bool(content_noindex_directive),
+                )
+            case "unsafe-content":
+                report = UnsafeContent(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                )
+            case "correction":
+                content_expected, content_found = (
+                    request.form.get("content-expected"),
+                    request.form.get("content-found"),
+                )
+                if not (content_expected and content_found):
+                    return abort(400)
+                if content_expected == content_found:
+                    return abort(400)
+                report = Correction(
+                    recipe_id=recipe_id,
+                    report_type=report_type,
+                    result_index=result_index,
+                    content_expected=content_expected,
+                    content_found=content_found,
+                )
+            case _:
+                return abort(400)
+    except AssertionError:
+        return abort(400)
+
+    Feedback.register_report(recipe, report)
+    return jsonify({"recipe_id": report["recipe_id"]})

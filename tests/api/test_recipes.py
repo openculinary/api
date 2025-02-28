@@ -1,5 +1,8 @@
+import pytest
 from unittest.mock import patch
 
+from reciperadar.api.recipes import Feedback
+from reciperadar.models.recipes import Recipe
 from reciperadar.search.recipes import RecipeSearch
 from reciperadar.search.base import EntityClause
 
@@ -107,3 +110,54 @@ def test_bot_search(query, store, recrawl, client):
 
     assert store.called
     assert store.call_args[1]["event_data"]["suspected_bot"] is True
+
+
+@patch.object(Feedback, "register_report")
+@patch.object(Recipe, "get_by_id")
+@pytest.mark.parametrize(
+    "report_data",
+    [
+        # missing report type
+        {"recipe-id": "recipe_id_0", "result-index": 0},
+        # non-integer index
+        {
+            "recipe-id": "recipe_id_0",
+            "report-type": "unsafe-content",
+            "result-index": "",
+        },
+        # invalid report type
+        {"recipe-id": "recipe_id_0", "report-type": "invalid", "result-index": 0},
+    ],
+)
+def test_invalid_problem_report(get_recipe_by_id, report, client, report_data):
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
+    get_recipe_by_id.return_value = recipe
+
+    response = client.post(
+        path="/recipes/report",
+        headers={"Content-Type": "application/json"},
+        data=report_data,
+    )
+
+    assert not report.called
+    assert response.status_code == 400
+
+
+@patch.object(Feedback, "register_report")
+@patch.object(Recipe, "get_by_id")
+def test_unsafe_content_report(get_recipe_by_id, register_report, client):
+    recipe = Recipe(id="example_id", domain="example.test", dst="http://example.test")
+    get_recipe_by_id.return_value = recipe
+
+    report_data = {
+        "recipe-id": "test_recipe_id",
+        "report-type": "unsafe-content",
+        "result-index": 0,
+    }
+    response = client.post(
+        path="/recipes/report",
+        data=report_data,
+    )
+
+    assert register_report.called
+    assert response.status_code == 200
