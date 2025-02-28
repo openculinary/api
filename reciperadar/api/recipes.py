@@ -199,8 +199,8 @@ def recipe_report():
                 )
             case "correction":
                 content_expected, content_found = (
-                    request.form.get("context-expected"),
-                    request.form.get("context-found"),
+                    request.form.get("content-expected"),
+                    request.form.get("content-found"),
                 )
                 if not (content_expected and content_found):
                     return abort(400)
