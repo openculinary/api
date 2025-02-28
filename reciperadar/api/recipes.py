@@ -160,7 +160,7 @@ def recipe_report():
 
     try:
         report_type = request.form.get("report-type")
-        result_index = request.form.get("result-index", type=int)
+        result_index = 0  # request.form.get("result-index", type=int)
     except Exception:
         return abort(400)
 
