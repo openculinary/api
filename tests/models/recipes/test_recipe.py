@@ -21,9 +21,6 @@ def test_recipe_from_doc(raw_recipe_hit):
     assert "nutrition" not in recipe.ingredients[0].to_dict()
     assert "is_vegetarian" in recipe.to_dict()
 
-    assert recipe.ingredients[0].nutrition.carbohydrates == 0
-    assert recipe.ingredients[0].nutrition.fibre == 0.65
-
     assert recipe.nutrition.to_dict() == {
         "carbohydrates": {"magnitude": 0, "units": "g"},
         "energy": {"magnitude": 0, "units": "cal"},

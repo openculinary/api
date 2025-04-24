@@ -42,29 +42,6 @@ class Nutrition(Storable):
         }
 
 
-class IngredientNutrition(Nutrition):
-    __tablename__ = "ingredient_nutrition"
-
-    fk = db.ForeignKey("recipe_ingredients.id")
-    ingredient_id = db.Column(db.String, fk)
-
-    @staticmethod
-    def from_doc(doc):
-        return IngredientNutrition(
-            id=doc["id"],
-            carbohydrates=doc.get("carbohydrates"),
-            carbohydrates_units=doc.get("carbohydrates_units"),
-            energy=doc.get("energy"),
-            energy_units=doc.get("energy_units"),
-            fat=doc.get("fat"),
-            fat_units=doc.get("fat_units"),
-            fibre=doc.get("fibre"),
-            fibre_units=doc.get("fibre_units"),
-            protein=doc.get("protein"),
-            protein_units=doc.get("protein_units"),
-        )
-
-
 class RecipeNutrition(Nutrition):
     __tablename__ = "recipe_nutrition"
 
