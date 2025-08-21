@@ -1,17 +1,17 @@
 # RecipeRadar API
 
-The RecipeRadar API provides data services to the RecipeRadar [frontend](https://www.github.com/openculinary/frontend) application.
+The RecipeRadar API provides data services to the RecipeRadar [frontend](https://codeberg.org/openculinary/frontend) application.
 
 It provides endpoints to support the following functionality:
 
 * Recipe and ingredient search
 * User feedback collection
 
-The API has high uptime and availability requirements since it's a core part of the [frontend](https://www.github.com/openculinary/frontend) recipe search experience.
+The API has high uptime and availability requirements since it's a core part of the [frontend](https://codeberg.org/openculinary/frontend) recipe search experience.
 
 ## Install dependencies
 
-Make sure to follow the RecipeRadar [infrastructure](https://www.github.com/openculinary/infrastructure) setup to ensure all cluster dependencies are available in your environment.
+Make sure to follow the RecipeRadar [infrastructure](https://codeberg.org/openculinary/infrastructure) setup to ensure all cluster dependencies are available in your environment.
 
 ## Development
 
